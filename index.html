@@ -95,6 +95,22 @@ body { background: var(--body-bg); }
 .balance-split .src .src-dot.card { background:var(--card-src); }
 .balance-split .src .src-dot.cash { background:var(--cash-src); }
 
+/* ====== ПЛАШКА ПЛАНА ====== */
+.plan-summary { display:flex; gap:8px; margin-top:14px; }
+.plan-summary .p {
+    flex:1; background:var(--soft); border-radius:14px; padding:10px 12px;
+    display:flex; flex-direction:column; gap:3px;
+}
+.plan-summary .p .pl { font-size:11px; color:var(--muted); }
+.plan-summary .p .pv { font-size:15px; font-weight:700; color:var(--text); }
+.plan-summary .p .pv.accent { color:var(--primary); }
+.plan-summary .p .pv.minus { color:var(--minus); }
+.plan-summary .p .pv.plus { color:var(--plus); }
+
+.plan-progress { height:10px; background:var(--track); border-radius:10px; overflow:hidden; margin-top:12px; }
+.plan-progress-fill { height:100%; background:var(--primary); border-radius:10px; transition:width .4s; }
+.plan-progress-fill.over { background:var(--minus); }
+
 .category-item {
     display:flex; justify-content:space-between; align-items:center;
     padding:10px 0; border-bottom:1px solid var(--border); gap:8px;
@@ -246,7 +262,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     padding:12px; border-radius:40px; font-size:15px; font-weight:600; cursor:pointer;
 }
 
-/* ====== СПИСОК РАСХОДОВ ====== */
 .expense-log-item {
     display:flex; justify-content:space-between; align-items:center;
     padding:12px 0; border-bottom:1px solid var(--border); gap:10px;
@@ -406,6 +421,33 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         <div class="header">
             <h1>Статистика</h1>
             <span class="text-muted small" id="stat-month">—</span>
+        </div>
+
+        <!-- НОВАЯ ПЛАШКА: ПЛАН -->
+        <div class="card">
+            <div class="card-title">План на месяц</div>
+            <div class="card-amount" id="stat-plan-amount">0 <small>₽</small></div>
+            <div class="card-sub" id="stat-plan-sub">Потрачено 0 ₽ · Осталось 0 ₽</div>
+
+            <div class="plan-summary">
+                <div class="p">
+                    <span class="pl">📋 Запланировано</span>
+                    <span class="pv accent" id="stat-plan-total">0 ₽</span>
+                </div>
+                <div class="p">
+                    <span class="pl">💸 Потрачено</span>
+                    <span class="pv" id="stat-plan-spent">0 ₽</span>
+                </div>
+                <div class="p">
+                    <span class="pl">✅ Осталось</span>
+                    <span class="pv plus" id="stat-plan-left">0 ₽</span>
+                </div>
+            </div>
+
+            <div class="plan-progress">
+                <div class="plan-progress-fill" id="stat-plan-bar" style="width:0%"></div>
+            </div>
+            <div class="card-sub" id="stat-plan-note" style="margin-top:8px;"></div>
         </div>
 
         <div class="card">
@@ -576,7 +618,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
-<!-- Расход: добавить/редактировать -->
 <div class="modal-overlay" id="expense-modal">
     <div class="modal">
         <h3 id="expense-modal-title">Добавить расход</h3>
@@ -600,7 +641,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
-<!-- Список расходов категории -->
 <div class="modal-overlay" id="expense-list-modal">
     <div class="modal">
         <h3 id="expense-list-title">Расходы</h3>
@@ -630,7 +670,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
-<!-- Цель -->
 <div class="modal-overlay" id="goal-modal">
     <div class="modal">
         <h3 id="goal-modal-title">Новая цель</h3>
@@ -971,6 +1010,59 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         document.getElementById('stat-month').textContent = monthLabel(THIS_MONTH);
 
+        /* -------- ПЛАШКА «ПЛАН НА МЕСЯЦ» -------- */
+        const planned = t.planned;
+        const spent = t.spent;
+        const left = round2(planned - spent);
+        const pct = planned > 0 ? Math.min(100, (spent / planned) * 100) : (spent > 0 ? 100 : 0);
+        const over = planned > 0 && spent > planned;
+
+        const planAmountEl = document.getElementById('stat-plan-amount');
+        if (planned === 0) {
+            planAmountEl.innerHTML = '0 <small>₽</small>';
+            planAmountEl.style.color = 'var(--text)';
+            document.getElementById('stat-plan-sub').textContent = 'План пока не задан';
+        } else if (over) {
+            planAmountEl.innerHTML = '−' + fmt(Math.abs(left)) + ' <small>₽</small>';
+            planAmountEl.style.color = 'var(--minus)';
+            document.getElementById('stat-plan-sub').innerHTML =
+                'Потрачено ' + fmt(spent) + ' ₽ · <span class="minus-text">Перерасход на ' +
+                fmt(Math.abs(left)) + ' ₽</span>';
+        } else {
+            planAmountEl.innerHTML = fmt(left) + ' <small>₽</small>';
+            planAmountEl.style.color = 'var(--text)';
+            document.getElementById('stat-plan-sub').textContent =
+                'Потрачено ' + fmt(spent) + ' ₽ · Осталось ' + fmt(left) + ' ₽';
+        }
+
+        document.getElementById('stat-plan-total').textContent = fmt(planned) + ' ₽';
+        document.getElementById('stat-plan-spent').textContent = fmt(spent) + ' ₽';
+
+        const leftEl = document.getElementById('stat-plan-left');
+        leftEl.textContent = (left < 0 ? '−' : '') + fmt(Math.abs(left)) + ' ₽';
+        leftEl.classList.remove('plus', 'minus');
+        if (left < 0) leftEl.classList.add('minus');
+        else leftEl.classList.add('plus');
+
+        const bar = document.getElementById('stat-plan-bar');
+        bar.style.width = pct + '%';
+        bar.classList.toggle('over', over);
+
+        // пояснение
+        const noteEl = document.getElementById('stat-plan-note');
+        if (planned === 0) {
+            noteEl.innerHTML = 'Добавьте пункты плана на главной, чтобы видеть прогресс.';
+        } else if (over) {
+            noteEl.innerHTML = '⚠️ Вы потратили больше, чем запланировали, на <b style="color:var(--minus)">' +
+                fmt(Math.abs(left)) + ' ₽</b>.';
+        } else if (spent === 0) {
+            noteEl.innerHTML = 'Пока ничего не потрачено. В плане ' + fmt(planned) + ' ₽.';
+        } else {
+            noteEl.innerHTML = 'Использовано ' + Math.round(pct) + '% плана. ' +
+                'Осталось ' + fmt(left) + ' ₽ из ' + fmt(planned) + ' ₽.';
+        }
+
+        /* -------- БАЛАНС МЕСЯЦА -------- */
         const balEl = document.getElementById('stat-balance');
         const subEl = document.getElementById('stat-balance-sub');
         if (t.balance < 0) {
@@ -991,6 +1083,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         balCardEl.classList.toggle('minus', t.balanceCard < 0);
         balCashEl.classList.toggle('minus', t.balanceCash < 0);
 
+        /* -------- КАТЕГОРИИ -------- */
         const catBox = document.getElementById('stat-categories');
         catBox.innerHTML = '';
         if (m.categories.length === 0) {
@@ -998,9 +1091,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         } else {
             m.categories.forEach(cat => {
                 const plan = round2(cat.plan || 0);
-                const spent = catSpentTotal(cat);
-                const pct = plan > 0 ? Math.min(100, (spent / plan) * 100) : (spent > 0 ? 100 : 0);
-                const over = plan > 0 && spent > plan;
+                const s = catSpentTotal(cat);
+                const p = plan > 0 ? Math.min(100, (s / plan) * 100) : (s > 0 ? 100 : 0);
+                const ov = plan > 0 && s > plan;
                 const cardS = catSpentCard(cat);
                 const cashS = catSpentCash(cat);
 
@@ -1017,10 +1110,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 div.innerHTML =
                     '<div class="bar-top">' +
                         '<span class="name">' + escapeHtml(cat.name) + '</span>' +
-                        '<span class="nums">' + fmt(spent) + ' / ' + fmt(plan) + ' ₽</span>' +
+                        '<span class="nums">' + fmt(s) + ' / ' + fmt(plan) + ' ₽</span>' +
                     '</div>' +
-                    '<div class="bar-track"><div class="bar-fill' + (over ? ' over' : '') +
-                    '" style="width:' + pct + '%"></div></div>' +
+                    '<div class="bar-track"><div class="bar-fill' + (ov ? ' over' : '') +
+                    '" style="width:' + p + '%"></div></div>' +
                     srcLine;
                 catBox.appendChild(div);
             });
@@ -1272,8 +1365,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     /* ============================================================
        РАСХОД — ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ
        ============================================================ */
-    let expenseCatId = null;      // id категории, к которой добавляем/редактируем
-    let editingExpenseId = null;  // id расхода при редактировании (null = добавление)
+    let expenseCatId = null;
+    let editingExpenseId = null;
     let expenseSource = 'card';
 
     function setExpenseSource(src) {
@@ -1299,7 +1392,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         }
     }
 
-    // Открыть окно для нового расхода
     function openExpenseModal(catId) {
         expenseCatId = catId;
         editingExpenseId = null;
@@ -1313,7 +1405,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         setTimeout(() => document.getElementById('input-expense').focus(), 150);
     }
 
-    // Открыть окно для редактирования существующего расхода
     function openEditExpenseModal(catId, expenseId) {
         expenseCatId = catId;
         editingExpenseId = expenseId;
@@ -1337,16 +1428,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         if (!cat) { closeModal('expense-modal'); return; }
 
         if (editingExpenseId) {
-            // Редактирование существующей записи
             const exp = (cat.expenses || []).find(e => e.id === editingExpenseId);
             if (exp) {
                 exp.amount = amount;
                 exp.source = expenseSource;
-                // дату оставляем прежней
             }
             recalcCategoryFromExpenses(cat);
         } else {
-            // Добавление новой записи
             if (!cat.expenses) cat.expenses = [];
             cat.expenses.push({
                 id: 'e' + Date.now() + Math.random().toString(36).slice(2, 6),
@@ -1366,13 +1454,12 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         expenseCatId = null;
         editingExpenseId = null;
 
-        // Если открыт список расходов — обновим его тоже
         if (logCatId) renderExpenseLog();
         renderAll();
     });
 
     /* ============================================================
-       СПИСОК РАСХОДОВ — просмотр, редактирование, удаление
+       СПИСОК РАСХОДОВ
        ============================================================ */
     let logCatId = null;
 
@@ -1441,7 +1528,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             box.appendChild(div);
         });
 
-        // Редактировать
         box.querySelectorAll('button[data-edit-id]').forEach(btn => {
             btn.addEventListener('click', function () {
                 const eid = this.dataset.editId;
@@ -1450,7 +1536,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             });
         });
 
-        // Удалить конкретную запись
         box.querySelectorAll('button[data-expense-id]').forEach(btn => {
             btn.addEventListener('click', function () {
                 const eid = this.dataset.expenseId;
