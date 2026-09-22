@@ -83,17 +83,31 @@ body { background: var(--body-bg); }
 
 .badge { background:var(--badge); padding:4px 12px; border-radius:30px; font-size:13px; font-weight:500; color:var(--text); text-transform:capitalize; }
 
+/* ====== РАЗБИВКА ОСТАТКОВ ПО ИСТОЧНИКАМ (кликабельная) ====== */
 .balance-split { display:flex; gap:10px; margin-top:12px; }
 .balance-split .src {
     flex:1; background:var(--soft); border-radius:14px; padding:10px 12px;
     display:flex; flex-direction:column; gap:3px;
+    cursor:pointer; transition:.15s; position:relative;
+    border:2px solid transparent;
 }
+.balance-split .src:hover {
+    background:var(--soft-hover);
+    border-color:var(--primary);
+}
+.balance-split .src:active { transform:scale(.98); }
 .balance-split .src .src-label { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:5px; }
 .balance-split .src .src-value { font-size:16px; font-weight:700; color:var(--text); }
 .balance-split .src .src-value.minus { color:var(--minus); }
 .balance-split .src .src-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
 .balance-split .src .src-dot.card { background:var(--card-src); }
 .balance-split .src .src-dot.cash { background:var(--cash-src); }
+
+.balance-split .src .edit-badge {
+    position:absolute; top:8px; right:8px;
+    font-size:11px; opacity:.5;
+    color:var(--muted);
+}
 
 /* ====== ПЛАШКА ПЛАНА ====== */
 .plan-summary { display:flex; gap:8px; margin-top:14px; }
@@ -368,11 +382,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-sub" id="balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
 
             <div class="balance-split">
-                <div class="src">
+                <div class="src" data-edit-src="card" title="Нажмите, чтобы изменить доход на карте">
+                    <span class="edit-badge">✎</span>
                     <span class="src-label"><span class="src-dot card"></span>💳 На карте</span>
                     <span class="src-value" id="balance-card">0 ₽</span>
                 </div>
-                <div class="src">
+                <div class="src" data-edit-src="cash" title="Нажмите, чтобы изменить доход наличными">
+                    <span class="edit-badge">✎</span>
                     <span class="src-label"><span class="src-dot cash"></span>💵 Наличные</span>
                     <span class="src-value" id="balance-cash">0 ₽</span>
                 </div>
@@ -423,7 +439,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <span class="text-muted small" id="stat-month">—</span>
         </div>
 
-        <!-- НОВАЯ ПЛАШКА: ПЛАН -->
         <div class="card">
             <div class="card-title">План на месяц</div>
             <div class="card-amount" id="stat-plan-amount">0 <small>₽</small></div>
@@ -455,11 +470,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-amount" id="stat-balance">0 <small>₽</small></div>
             <div class="card-sub" id="stat-balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
             <div class="balance-split">
-                <div class="src">
+                <div class="src" data-edit-src="card" title="Изменить доход на карте">
+                    <span class="edit-badge">✎</span>
                     <span class="src-label"><span class="src-dot card"></span>💳 Карта</span>
                     <span class="src-value" id="stat-balance-card">0 ₽</span>
                 </div>
-                <div class="src">
+                <div class="src" data-edit-src="cash" title="Изменить доход наличными">
+                    <span class="edit-badge">✎</span>
                     <span class="src-label"><span class="src-dot cash"></span>💵 Наличные</span>
                     <span class="src-value" id="stat-balance-cash">0 ₽</span>
                 </div>
@@ -897,6 +914,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             subEl.textContent = 'Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽';
         }
 
+        // Остаток по источникам (доход - расход)
         const balCardEl = document.getElementById('balance-card');
         const balCashEl = document.getElementById('balance-cash');
         balCardEl.textContent = fmt(t.balanceCard) + ' ₽';
@@ -1048,7 +1066,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         bar.style.width = pct + '%';
         bar.classList.toggle('over', over);
 
-        // пояснение
         const noteEl = document.getElementById('stat-plan-note');
         if (planned === 0) {
             noteEl.innerHTML = 'Добавьте пункты плана на главной, чтобы видеть прогресс.';
@@ -1302,11 +1319,26 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     const inputIncomeCard = document.getElementById('input-income-card');
     const inputIncomeCash = document.getElementById('input-income-cash');
 
-    document.getElementById('edit-income-btn').addEventListener('click', () => {
+    // Открыть окно редактирования дохода (при желании — с фокусом на нужное поле)
+    function openIncomeModal(focusField) {
         const m = getMonth(THIS_MONTH);
         inputIncomeCard.value = m.incomeCard ? String(m.incomeCard).replace('.', ',') : '';
         inputIncomeCash.value = m.incomeCash ? String(m.incomeCash).replace('.', ',') : '';
         openModal('income-modal');
+        setTimeout(() => {
+            if (focusField === 'cash') inputIncomeCash.focus();
+            else inputIncomeCard.focus();
+        }, 150);
+    }
+
+    document.getElementById('edit-income-btn').addEventListener('click', () => openIncomeModal('card'));
+
+    // Клик по блоку "На карте" / "Наличные" в балансе
+    document.querySelectorAll('.src[data-edit-src]').forEach(el => {
+        el.addEventListener('click', function () {
+            const src = this.dataset.editSrc;
+            openIncomeModal(src === 'cash' ? 'cash' : 'card');
+        });
     });
 
     document.getElementById('save-income').addEventListener('click', () => {
