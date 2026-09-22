@@ -83,44 +83,7 @@ body { background: var(--body-bg); }
 
 .badge { background:var(--badge); padding:4px 12px; border-radius:30px; font-size:13px; font-weight:500; color:var(--text); text-transform:capitalize; }
 
-/* ============================================================
-   ТОЧКИ-ИНДИКАТОРЫ — ЖЁСТКО 8×8px
-   ============================================================ */
-.src-dot {
-    display: inline-block !important;
-    width: 8px !important;
-    height: 8px !important;
-    min-width: 8px !important;
-    min-height: 8px !important;
-    max-width: 8px !important;
-    max-height: 8px !important;
-    border-radius: 50% !important;
-    flex-shrink: 0 !important;
-    flex-grow: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    line-height: 0 !important;
-    font-size: 0 !important;
-    vertical-align: middle;
-    box-sizing: border-box;
-    align-self: center;
-}
-.src-dot.card { background: var(--card-src) !important; }
-.src-dot.cash { background: var(--cash-src) !important; }
-
-/* строка с точкой + подписью */
-.src-label-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--muted);
-    height: 16px;
-    line-height: 16px;
-    min-height: 16px;
-}
-
-/* ====== РАЗБИВКА ОСТАТКОВ ПО ИСТОЧНИКАМ ====== */
+/* ====== РАЗБИВКА ОСТАТКОВ ПО ИСТОЧНИКАМ (кликабельная) ====== */
 .balance-split { display:flex; gap:10px; margin-top:12px; }
 .balance-split .src {
     flex:1; background:var(--soft); border-radius:14px; padding:10px 12px;
@@ -133,8 +96,12 @@ body { background: var(--body-bg); }
     border-color:var(--primary);
 }
 .balance-split .src:active { transform:scale(.98); }
+.balance-split .src .src-label { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:5px; }
 .balance-split .src .src-value { font-size:16px; font-weight:700; color:var(--text); }
 .balance-split .src .src-value.minus { color:var(--minus); }
+.balance-split .src .src-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
+.balance-split .src .src-dot.card { background:var(--card-src); }
+.balance-split .src .src-dot.cash { background:var(--cash-src); }
 
 .balance-split .src .edit-badge {
     position:absolute; top:8px; right:8px;
@@ -172,7 +139,7 @@ body { background: var(--body-bg); }
 .category-stats .left { font-size:12px; color:var(--muted); }
 .category-stats .left.negative { color:var(--minus); }
 
-.src-mini { display:flex; gap:5px; justify-content:flex-end; margin-top:3px; flex-wrap:wrap; align-items:center; }
+.src-mini { display:flex; gap:5px; justify-content:flex-end; margin-top:3px; flex-wrap:wrap; }
 .src-mini span {
     font-size:10px; padding:1px 6px; border-radius:10px; font-weight:600;
     background:var(--soft); color:var(--muted); white-space:nowrap;
@@ -194,10 +161,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .income-row {
     display:flex; justify-content:space-between; align-items:center;
     padding:12px 14px; border-radius:16px; background:var(--income-bg); margin-bottom:8px;
-    gap:10px;
 }
 .income-row:last-child { margin-bottom:0; }
-.income-row .label { font-size:14px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+.income-row .label { font-size:14px; color:var(--muted); }
 .income-row .value { font-weight:700; font-size:17px; color:var(--text); }
 .income-row.total { background:var(--income-total-bg); }
 
@@ -290,17 +256,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .source-picker button.active { border-color:var(--primary); background:var(--primary); color:#fff; }
 .source-picker button.active.card-src { border-color:var(--card-src); background:var(--card-src); }
 .source-picker button.active.cash-src { border-color:var(--cash-src); background:var(--cash-src); }
-
-/* ====== ПЕРЕВОД — показ текущего остатка ====== */
-.transfer-current {
-    display:flex; gap:8px; margin-bottom:14px;
-}
-.transfer-current .tc {
-    flex:1; background:var(--soft); border-radius:14px; padding:10px 12px;
-    display:flex; flex-direction:column; gap:4px;
-}
-.transfer-current .tc .tc-label { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:5px; }
-.transfer-current .tc .tc-value { font-size:16px; font-weight:700; color:var(--text); }
 
 .modal-overlay {
     position:fixed; inset:0; background:rgba(0,0,0,.45);
@@ -421,27 +376,20 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="user-icon">M</div>
         </div>
 
-        <!-- БАЛАНС МЕСЯЦА -->
         <div class="card">
             <div class="card-title">Баланс месяца</div>
             <div class="card-amount" id="balance-amount">0 <small>₽</small></div>
             <div class="card-sub" id="balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
 
             <div class="balance-split">
-                <div class="src" data-transfer-src="card" title="Нажмите, чтобы перевести деньги">
-                    <span class="edit-badge">⇄</span>
-                    <span class="src-label-row">
-                        <span class="src-dot card"></span>
-                        <span>💳 На карте</span>
-                    </span>
+                <div class="src" data-edit-src="card" title="Нажмите, чтобы изменить доход на карте">
+                    <span class="edit-badge">✎</span>
+                    <span class="src-label"><span class="src-dot card"></span>💳 На карте</span>
                     <span class="src-value" id="balance-card">0 ₽</span>
                 </div>
-                <div class="src" data-transfer-src="cash" title="Нажмите, чтобы перевести деньги">
-                    <span class="edit-badge">⇄</span>
-                    <span class="src-label-row">
-                        <span class="src-dot cash"></span>
-                        <span>💵 Наличные</span>
-                    </span>
+                <div class="src" data-edit-src="cash" title="Нажмите, чтобы изменить доход наличными">
+                    <span class="edit-badge">✎</span>
+                    <span class="src-label"><span class="src-dot cash"></span>💵 Наличные</span>
                     <span class="src-value" id="balance-cash">0 ₽</span>
                 </div>
             </div>
@@ -464,18 +412,17 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div id="main-goal-preview"></div>
         </div>
 
-        <!-- МОИ ДОХОДЫ -->
         <div class="card">
             <div class="row-space-between mb-1">
                 <span class="card-title">Мои доходы</span>
                 <button class="icon-btn" id="edit-income-btn" title="Изменить доход">✎</button>
             </div>
             <div class="income-row">
-                <span class="label"><span class="src-dot card"></span>💳 На карте</span>
+                <span class="label">💳 На карте</span>
                 <span class="value" id="income-card">0 ₽</span>
             </div>
             <div class="income-row">
-                <span class="label"><span class="src-dot cash"></span>💵 Наличными</span>
+                <span class="label">💵 Наличными</span>
                 <span class="value" id="income-cash">0 ₽</span>
             </div>
             <div class="income-row total">
@@ -523,20 +470,14 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-amount" id="stat-balance">0 <small>₽</small></div>
             <div class="card-sub" id="stat-balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
             <div class="balance-split">
-                <div class="src" data-transfer-src="card" title="Перевести деньги">
-                    <span class="edit-badge">⇄</span>
-                    <span class="src-label-row">
-                        <span class="src-dot card"></span>
-                        <span>💳 Карта</span>
-                    </span>
+                <div class="src" data-edit-src="card" title="Изменить доход на карте">
+                    <span class="edit-badge">✎</span>
+                    <span class="src-label"><span class="src-dot card"></span>💳 Карта</span>
                     <span class="src-value" id="stat-balance-card">0 ₽</span>
                 </div>
-                <div class="src" data-transfer-src="cash" title="Перевести деньги">
-                    <span class="edit-badge">⇄</span>
-                    <span class="src-label-row">
-                        <span class="src-dot cash"></span>
-                        <span>💵 Наличные</span>
-                    </span>
+                <div class="src" data-edit-src="cash" title="Изменить доход наличными">
+                    <span class="edit-badge">✎</span>
+                    <span class="src-label"><span class="src-dot cash"></span>💵 Наличные</span>
                     <span class="src-value" id="stat-balance-cash">0 ₽</span>
                 </div>
             </div>
@@ -549,12 +490,12 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         <div class="card">
             <div class="card-title">Доходы и расходы</div>
-            <div class="income-row"><span class="label"><span class="src-dot card"></span>💳 Доход на карте</span><span class="value" id="stat-income-card">0 ₽</span></div>
-            <div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Доход наличными</span><span class="value" id="stat-income-cash">0 ₽</span></div>
+            <div class="income-row"><span class="label">💳 Доход на карте</span><span class="value" id="stat-income-card">0 ₽</span></div>
+            <div class="income-row"><span class="label">💵 Доход наличными</span><span class="value" id="stat-income-cash">0 ₽</span></div>
             <div class="income-row total"><span class="label">Всего доход</span><span class="value" id="stat-income-total">0 ₽</span></div>
 
-            <div class="income-row" style="margin-top:10px;"><span class="label"><span class="src-dot card"></span>💳 Расход с карты</span><span class="value" id="stat-spent-card">0 ₽</span></div>
-            <div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Расход наличными</span><span class="value" id="stat-spent-cash">0 ₽</span></div>
+            <div class="income-row" style="margin-top:10px;"><span class="label">💳 Расход с карты</span><span class="value" id="stat-spent-card">0 ₽</span></div>
+            <div class="income-row"><span class="label">💵 Расход наличными</span><span class="value" id="stat-spent-cash">0 ₽</span></div>
             <div class="income-row total"><span class="label">Всего расход</span><span class="value" id="stat-spent-total">0 ₽</span></div>
         </div>
     </div>
@@ -658,7 +599,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 <div class="modal-overlay" id="income-modal">
     <div class="modal">
         <h3>Мои доходы за месяц</h3>
-        <div class="text-muted small mb-1">Здесь вы вводите сумму, которую получили. Это ваш основной доход.</div>
         <div class="field">
             <label>💳 На карте, ₽</label>
             <input type="text" id="input-income-card" placeholder="0" inputmode="decimal" autocomplete="off">
@@ -671,47 +611,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         </div>
         <div class="modal-actions">
             <button class="btn-secondary" data-close="income-modal">Отмена</button>
-            <button class="btn-primary" id="save-income">Сохранить доход</button>
-        </div>
-    </div>
-</div>
-
-<!-- ПЕРЕВОД МЕЖДУ КАРТОЙ И НАЛИЧНЫМИ -->
-<div class="modal-overlay" id="transfer-modal">
-    <div class="modal">
-        <h3 id="transfer-modal-title">Перевод</h3>
-        <div class="text-muted small mb-1" id="transfer-modal-hint">
-            Перекиньте деньги между картой и наличными. Например, сняли с карты — стали наличными.
-        </div>
-
-        <div class="transfer-current">
-            <div class="tc">
-                <span class="tc-label"><span class="src-dot card"></span>💳 На карте</span>
-                <span class="tc-value" id="tc-card">0 ₽</span>
-            </div>
-            <div class="tc">
-                <span class="tc-label"><span class="src-dot cash"></span>💵 Наличные</span>
-                <span class="tc-value" id="tc-cash">0 ₽</span>
-            </div>
-        </div>
-
-        <div class="field">
-            <label>Направление перевода</label>
-            <div class="source-picker">
-                <button type="button" id="dir-card-to-cash" class="active">💳 → 💵 С карты на наличные</button>
-                <button type="button" id="dir-cash-to-card">💵 → 💳 С наличных на карту</button>
-            </div>
-        </div>
-
-        <div class="field">
-            <label>Сумма перевода, ₽</label>
-            <input type="text" id="input-transfer" placeholder="0" inputmode="decimal" autocomplete="off">
-            <div class="hint">Можно с копейками: например 5000,50</div>
-        </div>
-
-        <div class="modal-actions">
-            <button class="btn-secondary" data-close="transfer-modal">Отмена</button>
-            <button class="btn-primary" id="save-transfer">Сохранить</button>
+            <button class="btn-primary" id="save-income">Сохранить</button>
         </div>
     </div>
 </div>
@@ -830,7 +730,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 (function () {
     'use strict';
 
-    const STORAGE_KEY = 'money_tochka_v9';
+    const STORAGE_KEY = 'money_tochka_v7';
 
     function currentMonthKey() {
         const d = new Date();
@@ -851,17 +751,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         return MONTHS_RU[m - 1].slice(0, 3).toLowerCase();
     }
 
-    // transferCard: сколько переведено с карты на наличные (+)
-    //                или с наличных на карту (−).
-    // Отрицательное значение = переводили на карту.
     function emptyMonth() {
-        return {
-            categories: [],
-            incomeCard: 0,
-            incomeCash: 0,
-            transferCard: 0,   // + с карты на наличные, − с наличных на карту
-            closed: false
-        };
+        return { categories: [], incomeCard: 0, incomeCash: 0, closed: false };
     }
 
     let state = {
@@ -890,12 +781,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
     function migrateMonth(m) {
         if (!m || !m.categories) return;
-        if (typeof m.incomeCard !== 'number') m.incomeCard = 0;
-        if (typeof m.incomeCash !== 'number') m.incomeCash = 0;
-        if (typeof m.transferCard !== 'number') m.transferCard = 0;
-        // удаляем старые ручные остатки, если были
-        delete m.balanceCard;
-        delete m.balanceCash;
         m.categories.forEach(c => {
             if (typeof c.spentCard !== 'number') c.spentCard = 0;
             if (typeof c.spentCash !== 'number') c.spentCash = 0;
@@ -954,24 +839,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     function catSpentCash(c) { return round2(c.spentCash || 0); }
     function catSpentTotal(c) { return round2(catSpentCard(c) + catSpentCash(c)); }
 
-    /* ============================================================
-       ПОДСЧЁТЫ
-       Доход — incomeCard / incomeCash.
-       Расход — сумма по категориям.
-       Перевод — transferCard (+ с карты на наличные, − обратно).
-       Остаток:
-         карта   = incomeCard − spentCard − transferCard
-         нал     = incomeCash − spentCash + transferCard
-       ============================================================ */
     function monthTotals(key) {
         const m = state.months[key];
-        if (!m) return {
-            income:0, incomeCard:0, incomeCash:0,
-            spent:0, spentCard:0, spentCash:0, planned:0,
-            balance:0, balanceCard:0, balanceCash:0,
-            transferCard:0
-        };
-
+        if (!m) return { income:0, spent:0, spentCard:0, spentCash:0, planned:0, balance:0, balanceCard:0, balanceCash:0, incomeCard:0, incomeCash:0 };
         const incomeCard = round2(m.incomeCard || 0);
         const incomeCash = round2(m.incomeCash || 0);
         const income = round2(incomeCard + incomeCash);
@@ -981,21 +851,15 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             spentCard = round2(spentCard + catSpentCard(c));
             spentCash = round2(spentCash + catSpentCash(c));
         });
-        const planned = round2(m.categories.reduce((s, c) => s + (c.plan || 0), 0));
-
-        const transferCard = round2(m.transferCard || 0);
-
-        const balanceCard = round2(incomeCard - spentCard - transferCard);
-        const balanceCash = round2(incomeCash - spentCash + transferCard);
-        const balance = round2(balanceCard + balanceCash);
-
         const spent = round2(spentCard + spentCash);
+        const planned = round2(m.categories.reduce((s, c) => s + (c.plan || 0), 0));
 
         return {
             income, incomeCard, incomeCash,
             spent, spentCard, spentCash, planned,
-            balance, balanceCard, balanceCash,
-            transferCard
+            balance: round2(income - spent),
+            balanceCard: round2(incomeCard - spentCard),
+            balanceCash: round2(incomeCash - spentCash)
         };
     }
 
@@ -1050,6 +914,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             subEl.textContent = 'Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽';
         }
 
+        // Остаток по источникам (доход - расход)
         const balCardEl = document.getElementById('balance-card');
         const balCashEl = document.getElementById('balance-cash');
         balCardEl.textContent = fmt(t.balanceCard) + ' ₽';
@@ -1163,6 +1028,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         document.getElementById('stat-month').textContent = monthLabel(THIS_MONTH);
 
+        /* -------- ПЛАШКА «ПЛАН НА МЕСЯЦ» -------- */
         const planned = t.planned;
         const spent = t.spent;
         const left = round2(planned - spent);
@@ -1213,6 +1079,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 'Осталось ' + fmt(left) + ' ₽ из ' + fmt(planned) + ' ₽.';
         }
 
+        /* -------- БАЛАНС МЕСЯЦА -------- */
         const balEl = document.getElementById('stat-balance');
         const subEl = document.getElementById('stat-balance-sub');
         if (t.balance < 0) {
@@ -1233,6 +1100,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         balCardEl.classList.toggle('minus', t.balanceCard < 0);
         balCashEl.classList.toggle('minus', t.balanceCash < 0);
 
+        /* -------- КАТЕГОРИИ -------- */
         const catBox = document.getElementById('stat-categories');
         catBox.innerHTML = '';
         if (m.categories.length === 0) {
@@ -1446,17 +1314,31 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     }
 
     /* ============================================================
-       ДОХОД (основная сумма) — блок «Мои доходы»
+       ДОХОД
        ============================================================ */
     const inputIncomeCard = document.getElementById('input-income-card');
     const inputIncomeCash = document.getElementById('input-income-cash');
 
-    document.getElementById('edit-income-btn').addEventListener('click', () => {
+    // Открыть окно редактирования дохода (при желании — с фокусом на нужное поле)
+    function openIncomeModal(focusField) {
         const m = getMonth(THIS_MONTH);
         inputIncomeCard.value = m.incomeCard ? String(m.incomeCard).replace('.', ',') : '';
         inputIncomeCash.value = m.incomeCash ? String(m.incomeCash).replace('.', ',') : '';
         openModal('income-modal');
-        setTimeout(() => inputIncomeCard.focus(), 150);
+        setTimeout(() => {
+            if (focusField === 'cash') inputIncomeCash.focus();
+            else inputIncomeCard.focus();
+        }, 150);
+    }
+
+    document.getElementById('edit-income-btn').addEventListener('click', () => openIncomeModal('card'));
+
+    // Клик по блоку "На карте" / "Наличные" в балансе
+    document.querySelectorAll('.src[data-edit-src]').forEach(el => {
+        el.addEventListener('click', function () {
+            const src = this.dataset.editSrc;
+            openIncomeModal(src === 'cash' ? 'cash' : 'card');
+        });
     });
 
     document.getElementById('save-income').addEventListener('click', () => {
@@ -1464,89 +1346,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         m.incomeCard = parseMoney(inputIncomeCard.value);
         m.incomeCash = parseMoney(inputIncomeCash.value);
         save(); closeModal('income-modal'); renderAll();
-    });
-
-    /* ============================================================
-       ПЕРЕВОД МЕЖДУ КАРТОЙ И НАЛИЧНЫМИ
-       ============================================================ */
-    const transferModal = document.getElementById('transfer-modal');
-    const inputTransfer = document.getElementById('input-transfer');
-    const transferModalTitle = document.getElementById('transfer-modal-title');
-    const transferModalHint = document.getElementById('transfer-modal-hint');
-    const tcCard = document.getElementById('tc-card');
-    const tcCash = document.getElementById('tc-cash');
-
-    // направление: 'card2cash' (с карты на наличные) или 'cash2card'
-    let transferDir = 'card2cash';
-
-    function setTransferDir(dir) {
-        transferDir = dir;
-        document.getElementById('dir-card-to-cash').classList.toggle('active', dir === 'card2cash');
-        document.getElementById('dir-cash-to-card').classList.toggle('active', dir === 'cash2card');
-
-        // Меняем порядок кнопок, чтобы активное действие было первым
-        const btn1 = document.getElementById('dir-card-to-cash');
-        const btn2 = document.getElementById('dir-cash-to-card');
-        const parent = btn1.parentNode;
-        if (dir === 'card2cash') {
-            parent.insertBefore(btn1, btn2);
-        } else {
-            parent.insertBefore(btn2, btn1);
-        }
-    }
-
-    document.getElementById('dir-card-to-cash').addEventListener('click', () => setTransferDir('card2cash'));
-    document.getElementById('dir-cash-to-card').addEventListener('click', () => setTransferDir('cash2card'));
-
-    // Открытие окна перевода из плашки «Карта» или «Наличные»
-    function openTransferModal(fromSrc) {
-        const t = monthTotals(THIS_MONTH);
-
-        // Обновляем отображаемые остатки
-        tcCard.textContent = fmt(t.balanceCard) + ' ₽';
-        tcCash.textContent = fmt(t.balanceCash) + ' ₽';
-        tcCard.classList.toggle('minus', t.balanceCard < 0);
-        tcCash.classList.toggle('minus', t.balanceCash < 0);
-
-        // Если нажали на «Карта» — по умолчанию переводим С карты НА наличные.
-        // Если нажали на «Наличные» — по умолчанию переводим С наличных НА карту.
-        if (fromSrc === 'card') {
-            transferModalTitle.textContent = 'Перевод: с карты на наличные';
-            transferModalHint.innerHTML =
-                'Сняли деньги с карты? Переведите сумму — она станет наличными. ' +
-                'Например, сняли <b>5000 ₽</b> с карты → на наличных станет больше на 5000 ₽.';
-            setTransferDir('card2cash');
-        } else {
-            transferModalTitle.textContent = 'Перевод: с наличных на карту';
-            transferModalHint.innerHTML =
-                'Внесли наличные на карту? Переведите сумму — она станет деньгами на карте. ' +
-                'Например, внесли <b>3000 ₽</b> на карту → на карте станет больше на 3000 ₽.';
-            setTransferDir('cash2card');
-        }
-
-        inputTransfer.value = '';
-        openModal('transfer-modal');
-        setTimeout(() => inputTransfer.focus(), 150);
-    }
-
-    document.querySelectorAll('[data-transfer-src]').forEach(el => {
-        el.addEventListener('click', function () {
-            openTransferModal(this.dataset.transferSrc === 'cash' ? 'cash' : 'card');
-        });
-    });
-
-    document.getElementById('save-transfer').addEventListener('click', () => {
-        const amount = parseMoney(inputTransfer.value);
-        if (!amount) { alert('Введите сумму'); return; }
-
-        const m = getMonth(THIS_MONTH);
-        // transferCard: + с карты на наличные, − с наличных на карту
-        const delta = (transferDir === 'card2cash') ? amount : -amount;
-        m.transferCard = round2((m.transferCard || 0) + delta);
-
-        save();
-        closeModal('transfer-modal');
-        renderAll();
     });
 
     /* ============================================================
@@ -1944,11 +1743,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
        ============================================================ */
     document.getElementById('reset-month').addEventListener('click', () => {
         if (!confirm('Обнулить все расходы текущего месяца? Планы и доходы сохранятся.')) return;
-        const m = getMonth(THIS_MONTH);
-        m.categories.forEach(c => {
+        getMonth(THIS_MONTH).categories.forEach(c => {
             c.spentCard = 0; c.spentCash = 0; c.expenses = [];
         });
-        m.transferCard = 0;
         save(); renderAll();
     });
 
