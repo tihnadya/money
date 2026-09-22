@@ -83,7 +83,39 @@ body { background: var(--body-bg); }
 
 .badge { background:var(--badge); padding:4px 12px; border-radius:30px; font-size:13px; font-weight:500; color:var(--text); text-transform:capitalize; }
 
-/* ====== РАЗБИВКА ОСТАТКОВ ПО ИСТОЧНИКАМ (кликабельная) ====== */
+.src-dot {
+    display: inline-block !important;
+    width: 8px !important;
+    height: 8px !important;
+    min-width: 8px !important;
+    min-height: 8px !important;
+    max-width: 8px !important;
+    max-height: 8px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 0 !important;
+    font-size: 0 !important;
+    vertical-align: middle;
+    box-sizing: border-box;
+    align-self: center;
+}
+.src-dot.card { background: var(--card-src) !important; }
+.src-dot.cash { background: var(--cash-src) !important; }
+
+.src-label-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    height: 16px;
+    line-height: 16px;
+    min-height: 16px;
+}
+
 .balance-split { display:flex; gap:10px; margin-top:12px; }
 .balance-split .src {
     flex:1; background:var(--soft); border-radius:14px; padding:10px 12px;
@@ -96,12 +128,8 @@ body { background: var(--body-bg); }
     border-color:var(--primary);
 }
 .balance-split .src:active { transform:scale(.98); }
-.balance-split .src .src-label { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:5px; }
 .balance-split .src .src-value { font-size:16px; font-weight:700; color:var(--text); }
 .balance-split .src .src-value.minus { color:var(--minus); }
-.balance-split .src .src-dot { width:8px; height:8px; border-radius:50%; display:inline-block; }
-.balance-split .src .src-dot.card { background:var(--card-src); }
-.balance-split .src .src-dot.cash { background:var(--cash-src); }
 
 .balance-split .src .edit-badge {
     position:absolute; top:8px; right:8px;
@@ -109,7 +137,6 @@ body { background: var(--body-bg); }
     color:var(--muted);
 }
 
-/* ====== ПЛАШКА ПЛАНА ====== */
 .plan-summary { display:flex; gap:8px; margin-top:14px; }
 .plan-summary .p {
     flex:1; background:var(--soft); border-radius:14px; padding:10px 12px;
@@ -139,7 +166,7 @@ body { background: var(--body-bg); }
 .category-stats .left { font-size:12px; color:var(--muted); }
 .category-stats .left.negative { color:var(--minus); }
 
-.src-mini { display:flex; gap:5px; justify-content:flex-end; margin-top:3px; flex-wrap:wrap; }
+.src-mini { display:flex; gap:5px; justify-content:flex-end; margin-top:3px; flex-wrap:wrap; align-items:center; }
 .src-mini span {
     font-size:10px; padding:1px 6px; border-radius:10px; font-weight:600;
     background:var(--soft); color:var(--muted); white-space:nowrap;
@@ -161,9 +188,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .income-row {
     display:flex; justify-content:space-between; align-items:center;
     padding:12px 14px; border-radius:16px; background:var(--income-bg); margin-bottom:8px;
+    gap:10px;
 }
 .income-row:last-child { margin-bottom:0; }
-.income-row .label { font-size:14px; color:var(--muted); }
+.income-row .label { font-size:14px; color:var(--muted); display:flex; align-items:center; gap:6px; }
 .income-row .value { font-weight:700; font-size:17px; color:var(--text); }
 .income-row.total { background:var(--income-total-bg); }
 
@@ -215,6 +243,22 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .settings-row .label { color:var(--text); font-weight:450; }
 .settings-row .value { color:var(--muted); text-align:right; }
 
+.history-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 0; border-bottom:1px solid var(--border);
+    gap:10px; cursor:pointer; transition:.15s;
+}
+.history-row:last-child { border-bottom:none; }
+.history-row:hover {
+    background:var(--soft);
+    margin:0 -18px; padding-left:18px; padding-right:18px;
+}
+.history-row.current { background:var(--income-total-bg); margin:0 -18px; padding-left:18px; padding-right:18px; border-radius:12px; }
+.history-row .h-name { color:var(--text); font-weight:500; flex:1; }
+.history-row .h-balance { color:var(--text); font-weight:600; }
+.history-row .h-balance.minus { color:var(--minus); }
+.history-row .h-chev { color:var(--muted); font-size:16px; }
+
 .theme-selector { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
 .theme-dot { width:36px; height:36px; border-radius:40px; border:2px solid transparent; cursor:pointer; transition:.2s; }
 .theme-dot.active { border-color:var(--primary); transform:scale(1.05); }
@@ -256,6 +300,14 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .source-picker button.active { border-color:var(--primary); background:var(--primary); color:#fff; }
 .source-picker button.active.card-src { border-color:var(--card-src); background:var(--card-src); }
 .source-picker button.active.cash-src { border-color:var(--cash-src); background:var(--cash-src); }
+
+.transfer-current { display:flex; gap:8px; margin-bottom:14px; }
+.transfer-current .tc {
+    flex:1; background:var(--soft); border-radius:14px; padding:10px 12px;
+    display:flex; flex-direction:column; gap:4px;
+}
+.transfer-current .tc .tc-label { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:5px; }
+.transfer-current .tc .tc-value { font-size:16px; font-weight:700; color:var(--text); }
 
 .modal-overlay {
     position:fixed; inset:0; background:rgba(0,0,0,.45);
@@ -369,7 +421,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 <body class="accent-pink mode-light">
 <div class="app-container">
 
-    <!-- ====== ГЛАВНАЯ ====== -->
     <div class="page active" id="page-main">
         <div class="header">
             <h1>Мани.<span>точка</span></h1>
@@ -382,14 +433,20 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-sub" id="balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
 
             <div class="balance-split">
-                <div class="src" data-edit-src="card" title="Нажмите, чтобы изменить доход на карте">
-                    <span class="edit-badge">✎</span>
-                    <span class="src-label"><span class="src-dot card"></span>💳 На карте</span>
+                <div class="src" data-transfer-src="card" title="Нажмите, чтобы перевести деньги">
+                    <span class="edit-badge">⇄</span>
+                    <span class="src-label-row">
+                        <span class="src-dot card"></span>
+                        <span>💳 На карте</span>
+                    </span>
                     <span class="src-value" id="balance-card">0 ₽</span>
                 </div>
-                <div class="src" data-edit-src="cash" title="Нажмите, чтобы изменить доход наличными">
-                    <span class="edit-badge">✎</span>
-                    <span class="src-label"><span class="src-dot cash"></span>💵 Наличные</span>
+                <div class="src" data-transfer-src="cash" title="Нажмите, чтобы перевести деньги">
+                    <span class="edit-badge">⇄</span>
+                    <span class="src-label-row">
+                        <span class="src-dot cash"></span>
+                        <span>💵 Наличные</span>
+                    </span>
                     <span class="src-value" id="balance-cash">0 ₽</span>
                 </div>
             </div>
@@ -418,11 +475,11 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 <button class="icon-btn" id="edit-income-btn" title="Изменить доход">✎</button>
             </div>
             <div class="income-row">
-                <span class="label">💳 На карте</span>
+                <span class="label"><span class="src-dot card"></span>💳 На карте</span>
                 <span class="value" id="income-card">0 ₽</span>
             </div>
             <div class="income-row">
-                <span class="label">💵 Наличными</span>
+                <span class="label"><span class="src-dot cash"></span>💵 Наличными</span>
                 <span class="value" id="income-cash">0 ₽</span>
             </div>
             <div class="income-row total">
@@ -432,7 +489,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         </div>
     </div>
 
-    <!-- ====== СТАТИСТИКА ====== -->
     <div class="page" id="page-stat">
         <div class="header">
             <h1>Статистика</h1>
@@ -470,14 +526,20 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-amount" id="stat-balance">0 <small>₽</small></div>
             <div class="card-sub" id="stat-balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
             <div class="balance-split">
-                <div class="src" data-edit-src="card" title="Изменить доход на карте">
-                    <span class="edit-badge">✎</span>
-                    <span class="src-label"><span class="src-dot card"></span>💳 Карта</span>
+                <div class="src" data-transfer-src="card" title="Перевести деньги">
+                    <span class="edit-badge">⇄</span>
+                    <span class="src-label-row">
+                        <span class="src-dot card"></span>
+                        <span>💳 Карта</span>
+                    </span>
                     <span class="src-value" id="stat-balance-card">0 ₽</span>
                 </div>
-                <div class="src" data-edit-src="cash" title="Изменить доход наличными">
-                    <span class="edit-badge">✎</span>
-                    <span class="src-label"><span class="src-dot cash"></span>💵 Наличные</span>
+                <div class="src" data-transfer-src="cash" title="Перевести деньги">
+                    <span class="edit-badge">⇄</span>
+                    <span class="src-label-row">
+                        <span class="src-dot cash"></span>
+                        <span>💵 Наличные</span>
+                    </span>
                     <span class="src-value" id="stat-balance-cash">0 ₽</span>
                 </div>
             </div>
@@ -490,17 +552,16 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         <div class="card">
             <div class="card-title">Доходы и расходы</div>
-            <div class="income-row"><span class="label">💳 Доход на карте</span><span class="value" id="stat-income-card">0 ₽</span></div>
-            <div class="income-row"><span class="label">💵 Доход наличными</span><span class="value" id="stat-income-cash">0 ₽</span></div>
+            <div class="income-row"><span class="label"><span class="src-dot card"></span>💳 Доход на карте</span><span class="value" id="stat-income-card">0 ₽</span></div>
+            <div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Доход наличными</span><span class="value" id="stat-income-cash">0 ₽</span></div>
             <div class="income-row total"><span class="label">Всего доход</span><span class="value" id="stat-income-total">0 ₽</span></div>
 
-            <div class="income-row" style="margin-top:10px;"><span class="label">💳 Расход с карты</span><span class="value" id="stat-spent-card">0 ₽</span></div>
-            <div class="income-row"><span class="label">💵 Расход наличными</span><span class="value" id="stat-spent-cash">0 ₽</span></div>
+            <div class="income-row" style="margin-top:10px;"><span class="label"><span class="src-dot card"></span>💳 Расход с карты</span><span class="value" id="stat-spent-card">0 ₽</span></div>
+            <div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Расход наличными</span><span class="value" id="stat-spent-cash">0 ₽</span></div>
             <div class="income-row total"><span class="label">Всего расход</span><span class="value" id="stat-spent-total">0 ₽</span></div>
         </div>
     </div>
 
-    <!-- ====== ЦЕЛИ ====== -->
     <div class="page" id="page-goals">
         <div class="header">
             <h1>Мои цели</h1>
@@ -521,7 +582,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         <button class="btn-add" id="add-goal-btn">+ Добавить цель</button>
     </div>
 
-    <!-- ====== АНАЛИТИКА ====== -->
     <div class="page" id="page-analytics">
         <div class="header">
             <h1>Аналитика</h1>
@@ -535,12 +595,14 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         </div>
 
         <div class="card">
-            <div class="card-title">Баланс по месяцам</div>
+            <div class="row-space-between mb-1">
+                <span class="card-title">История месяцев</span>
+                <span class="text-muted small">нажмите, чтобы открыть</span>
+            </div>
             <div id="history-list"></div>
         </div>
     </div>
 
-    <!-- ====== НАСТРОЙКИ ====== -->
     <div class="page" id="page-settings">
         <div class="header"><h1>Настройки</h1></div>
 
@@ -565,7 +627,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         <div class="card">
             <div class="card-title">Месяц</div>
-            <div class="text-muted small mb-1">Сбросить расходы текущего месяца. Доходы и история сохранятся.</div>
+            <div class="text-muted small mb-1">Сбросить расходы текущего месяца. Планы и доходы сохранятся.</div>
             <button class="button-reset" id="reset-month">Обнулить траты за месяц</button>
         </div>
 
@@ -573,6 +635,18 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-title">Профиль</div>
             <div class="settings-row"><span class="label">Имя</span><span class="value">Mirai</span></div>
             <div class="settings-row"><span class="label">Валюта</span><span class="value">₽ (рубль)</span></div>
+        </div>
+
+        <!-- Данные: экспорт/импорт -->
+        <div class="card">
+            <div class="card-title">Данные</div>
+            <div class="text-muted small mb-1">
+                Данные хранятся в браузере под ключом <b>money_tochka</b> и не удаляются при обновлении кода.
+                Можно сделать резервную копию или восстановить из файла.
+            </div>
+            <button class="btn-secondary" id="export-data" style="width:100%;margin-top:6px;">📤 Экспорт данных</button>
+            <button class="btn-secondary" id="import-data-btn" style="width:100%;margin-top:8px;">📥 Импорт данных</button>
+            <input type="file" id="import-data-file" accept="application/json" style="display:none;">
         </div>
 
         <div class="card">
@@ -599,6 +673,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 <div class="modal-overlay" id="income-modal">
     <div class="modal">
         <h3>Мои доходы за месяц</h3>
+        <div class="text-muted small mb-1">Здесь вы вводите сумму, которую получили. Это ваш основной доход.</div>
         <div class="field">
             <label>💳 На карте, ₽</label>
             <input type="text" id="input-income-card" placeholder="0" inputmode="decimal" autocomplete="off">
@@ -611,7 +686,46 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         </div>
         <div class="modal-actions">
             <button class="btn-secondary" data-close="income-modal">Отмена</button>
-            <button class="btn-primary" id="save-income">Сохранить</button>
+            <button class="btn-primary" id="save-income">Сохранить доход</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="transfer-modal">
+    <div class="modal">
+        <h3 id="transfer-modal-title">Перевод</h3>
+        <div class="text-muted small mb-1" id="transfer-modal-hint">
+            Перекиньте деньги между картой и наличными. Например, сняли с карты — стали наличными.
+        </div>
+
+        <div class="transfer-current">
+            <div class="tc">
+                <span class="tc-label"><span class="src-dot card"></span>💳 На карте</span>
+                <span class="tc-value" id="tc-card">0 ₽</span>
+            </div>
+            <div class="tc">
+                <span class="tc-label"><span class="src-dot cash"></span>💵 Наличные</span>
+                <span class="tc-value" id="tc-cash">0 ₽</span>
+            </div>
+        </div>
+
+        <div class="field">
+            <label>Направление перевода</label>
+            <div class="source-picker">
+                <button type="button" id="dir-card-to-cash" class="active">💳 → 💵 С карты на наличные</button>
+                <button type="button" id="dir-cash-to-card">💵 → 💳 С наличных на карту</button>
+            </div>
+        </div>
+
+        <div class="field">
+            <label>Сумма перевода, ₽</label>
+            <input type="text" id="input-transfer" placeholder="0" inputmode="decimal" autocomplete="off">
+            <div class="hint">Можно с копейками: например 5000,50</div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-secondary" data-close="transfer-modal">Отмена</button>
+            <button class="btn-primary" id="save-transfer">Сохранить</button>
         </div>
     </div>
 </div>
@@ -687,6 +801,17 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
+<div class="modal-overlay" id="month-view-modal">
+    <div class="modal">
+        <h3 id="month-view-title">Месяц</h3>
+        <div class="text-muted small mb-1" id="month-view-sub">Полная картина месяца</div>
+        <div id="month-view-content"></div>
+        <div class="modal-actions">
+            <button class="btn-secondary" data-close="month-view-modal">Закрыть</button>
+        </div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="goal-modal">
     <div class="modal">
         <h3 id="goal-modal-title">Новая цель</h3>
@@ -730,7 +855,57 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 (function () {
     'use strict';
 
-    const STORAGE_KEY = 'money_tochka_v7';
+    /* ============================================================
+       ХРАНИЛИЩЕ
+       Основной ключ — STORAGE_KEY. Он никогда не меняется.
+       При запуске, если по нему данных нет, ищем по всем старым
+       ключам и переносим в новый. Так данные сохраняются при
+       любой замене кода.
+       ============================================================ */
+    const STORAGE_KEY = 'money_tochka'; // постоянный ключ
+
+    // Список старых ключей, которые встречались в предыдущих версиях.
+    // Порядок: от самого свежего к самому старому.
+    const LEGACY_KEYS = [
+        'money_tochka_v10',
+        'money_tochka_v9',
+        'money_tochka_v8',
+        'money_tochka_v7',
+        'money_tochka_v6',
+        'money_tochka_v5',
+        'money_tochka_v4',
+        'money_tochka_v3',
+        'money_tochka_v2',
+        'money_tochka_v1'
+    ];
+
+    function loadState() {
+        // 1) Пробуем основной ключ
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.months) return parsed;
+            }
+        } catch (e) {}
+
+        // 2) Если нет — ищем по старым ключам
+        for (const k of LEGACY_KEYS) {
+            try {
+                const raw = localStorage.getItem(k);
+                if (!raw) continue;
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.months) {
+                    // Переносим в основной ключ
+                    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
+                    // Старый ключ не удаляем — на случай отката
+                    console.log('Данные перенесены из', k, 'в', STORAGE_KEY);
+                    return parsed;
+                }
+            } catch (e) {}
+        }
+        return null;
+    }
 
     function currentMonthKey() {
         const d = new Date();
@@ -752,7 +927,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     }
 
     function emptyMonth() {
-        return { categories: [], incomeCard: 0, incomeCash: 0, closed: false };
+        return {
+            categories: [],
+            incomeCard: 0,
+            incomeCash: 0,
+            transferCard: 0,
+            closed: false
+        };
     }
 
     let state = {
@@ -763,13 +944,11 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         lastClosedMonth: null
     };
 
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-            const parsed = JSON.parse(raw);
-            if (parsed && parsed.months) state = Object.assign(state, parsed);
-        }
-    } catch (e) {}
+    // Загружаем данные: основной ключ → старые ключи
+    const loaded = loadState();
+    if (loaded) {
+        state = Object.assign(state, loaded);
+    }
 
     if (!state.goals) state.goals = [];
     if (!state.months) state.months = {};
@@ -781,6 +960,11 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
     function migrateMonth(m) {
         if (!m || !m.categories) return;
+        if (typeof m.incomeCard !== 'number') m.incomeCard = 0;
+        if (typeof m.incomeCash !== 'number') m.incomeCash = 0;
+        if (typeof m.transferCard !== 'number') m.transferCard = 0;
+        delete m.balanceCard;
+        delete m.balanceCash;
         m.categories.forEach(c => {
             if (typeof c.spentCard !== 'number') c.spentCard = 0;
             if (typeof c.spentCash !== 'number') c.spentCash = 0;
@@ -841,7 +1025,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
     function monthTotals(key) {
         const m = state.months[key];
-        if (!m) return { income:0, spent:0, spentCard:0, spentCash:0, planned:0, balance:0, balanceCard:0, balanceCash:0, incomeCard:0, incomeCash:0 };
+        if (!m) return {
+            income:0, incomeCard:0, incomeCash:0,
+            spent:0, spentCard:0, spentCash:0, planned:0,
+            balance:0, balanceCard:0, balanceCash:0,
+            transferCard:0
+        };
+
         const incomeCard = round2(m.incomeCard || 0);
         const incomeCash = round2(m.incomeCash || 0);
         const income = round2(incomeCard + incomeCash);
@@ -851,15 +1041,21 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             spentCard = round2(spentCard + catSpentCard(c));
             spentCash = round2(spentCash + catSpentCash(c));
         });
-        const spent = round2(spentCard + spentCash);
         const planned = round2(m.categories.reduce((s, c) => s + (c.plan || 0), 0));
+
+        const transferCard = round2(m.transferCard || 0);
+
+        const balanceCard = round2(incomeCard - spentCard - transferCard);
+        const balanceCash = round2(incomeCash - spentCash + transferCard);
+        const balance = round2(balanceCard + balanceCash);
+
+        const spent = round2(spentCard + spentCash);
 
         return {
             income, incomeCard, incomeCash,
             spent, spentCard, spentCash, planned,
-            balance: round2(income - spent),
-            balanceCard: round2(incomeCard - spentCard),
-            balanceCash: round2(incomeCash - spentCash)
+            balance, balanceCard, balanceCash,
+            transferCard
         };
     }
 
@@ -892,9 +1088,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         }
     }
 
-    /* ============================================================
-       ГЛАВНАЯ
-       ============================================================ */
     function renderMain() {
         const m = getMonth(THIS_MONTH);
         const t = monthTotals(THIS_MONTH);
@@ -914,7 +1107,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             subEl.textContent = 'Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽';
         }
 
-        // Остаток по источникам (доход - расход)
         const balCardEl = document.getElementById('balance-card');
         const balCashEl = document.getElementById('balance-cash');
         balCardEl.textContent = fmt(t.balanceCard) + ' ₽';
@@ -1019,16 +1211,12 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             '</div>';
     }
 
-    /* ============================================================
-       СТАТИСТИКА
-       ============================================================ */
     function renderStat() {
         const m = getMonth(THIS_MONTH);
         const t = monthTotals(THIS_MONTH);
 
         document.getElementById('stat-month').textContent = monthLabel(THIS_MONTH);
 
-        /* -------- ПЛАШКА «ПЛАН НА МЕСЯЦ» -------- */
         const planned = t.planned;
         const spent = t.spent;
         const left = round2(planned - spent);
@@ -1079,7 +1267,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 'Осталось ' + fmt(left) + ' ₽ из ' + fmt(planned) + ' ₽.';
         }
 
-        /* -------- БАЛАНС МЕСЯЦА -------- */
         const balEl = document.getElementById('stat-balance');
         const subEl = document.getElementById('stat-balance-sub');
         if (t.balance < 0) {
@@ -1100,7 +1287,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         balCardEl.classList.toggle('minus', t.balanceCard < 0);
         balCashEl.classList.toggle('minus', t.balanceCash < 0);
 
-        /* -------- КАТЕГОРИИ -------- */
         const catBox = document.getElementById('stat-categories');
         catBox.innerHTML = '';
         if (m.categories.length === 0) {
@@ -1144,9 +1330,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         document.getElementById('stat-spent-total').textContent = fmt(t.spent) + ' ₽';
     }
 
-    /* ============================================================
-       ЦЕЛИ
-       ============================================================ */
     function renderGoals() {
         const container = document.getElementById('goals-container');
         container.innerHTML = '';
@@ -1230,9 +1413,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); renderAll();
     }
 
-    /* ============================================================
-       АНАЛИТИКА
-       ============================================================ */
     function renderAnalytics() {
         const prevKey = prevMonthKey(THIS_MONTH);
         const cur = monthTotals(THIS_MONTH);
@@ -1291,54 +1471,240 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         } else {
             keys.forEach(k => {
                 const t = monthTotals(k);
-                const m = state.months[k];
+                const isCurrent = k === THIS_MONTH;
                 const div = document.createElement('div');
-                div.className = 'settings-row';
-                const balColor = t.balance < 0 ? 'var(--minus)' : (k === THIS_MONTH ? 'var(--primary)' : 'var(--text)');
-                let savedInfo = '';
-                if (m && m.savedToGoal > 0 && k !== THIS_MONTH) {
-                    savedInfo = '<div class="text-muted small" style="width:100%;text-align:right;margin-top:2px;">→ в цель «' +
-                        escapeHtml(m.savedToGoalName || '') + '»: ' + fmt(m.savedToGoal) + ' ₽</div>';
-                }
+                div.className = 'history-row' + (isCurrent ? ' current' : '');
                 div.innerHTML =
-                    '<span class="label" style="flex:1;">' + monthLabel(k) + (k === THIS_MONTH ? ' · текущий' : '') +
-                        savedInfo +
-                    '</span>' +
-                    '<span class="value" style="color:' + balColor + '">' +
+                    '<span class="h-name">' + monthLabel(k) + (isCurrent ? ' · текущий' : '') + '</span>' +
+                    '<span class="h-balance' + (t.balance < 0 ? ' minus' : '') + '">' +
                         (t.balance < 0 ? '−' : '') + fmt(Math.abs(t.balance)) + ' ₽' +
-                    '</span>';
+                    '</span>' +
+                    '<span class="h-chev">›</span>';
+                div.addEventListener('click', () => openMonthView(k));
                 historyBox.appendChild(div);
             });
         }
         document.getElementById('months-count').textContent = keys.length;
     }
 
-    /* ============================================================
-       ДОХОД
-       ============================================================ */
+    let viewingMonthKey = null;
+
+    function openMonthView(key) {
+        viewingMonthKey = key;
+        const m = getMonth(key);
+        const t = monthTotals(key);
+        const isCurrent = key === THIS_MONTH;
+
+        document.getElementById('month-view-title').textContent = monthLabel(key);
+        document.getElementById('month-view-sub').textContent =
+            isCurrent ? 'Текущий месяц' : 'Прошлый месяц · только просмотр';
+
+        const box = document.getElementById('month-view-content');
+        let html = '';
+
+        html += '<div class="card" style="margin-bottom:12px;">' +
+            '<div class="card-title">Итоги месяца</div>' +
+            '<div class="card-amount" style="font-size:24px;color:' +
+                (t.balance < 0 ? 'var(--minus)' : 'var(--text)') + ';">' +
+                (t.balance < 0 ? '−' : '') + fmt(Math.abs(t.balance)) + ' <small>₽</small>' +
+            '</div>' +
+            '<div class="card-sub">Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽</div>';
+
+        if (!isCurrent && m.closed && m.savedToGoal > 0) {
+            html += '<div class="goal-hint" style="margin-top:8px;background:var(--income-total-bg);">' +
+                '✅ Переведено в цель «' + escapeHtml(m.savedToGoalName || '') + '»: <b>' +
+                fmt(m.savedToGoal) + ' ₽</b></div>';
+        } else if (!isCurrent && m.closed && (!m.savedToGoal || m.savedToGoal === 0)) {
+            html += '<div class="goal-hint" style="margin-top:8px;">В цель ничего не переведено (остаток ≤ 0)</div>';
+        }
+
+        html += '</div>';
+
+        html += '<div class="card" style="margin-bottom:12px;">' +
+            '<div class="card-title">Доходы</div>' +
+            '<div class="income-row"><span class="label"><span class="src-dot card"></span>💳 На карте</span>' +
+                '<span class="value">' + fmt(m.incomeCard) + ' ₽</span></div>' +
+            '<div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Наличными</span>' +
+                '<span class="value">' + fmt(m.incomeCash) + ' ₽</span></div>' +
+            '<div class="income-row total"><span class="label">Всего доход</span>' +
+                '<span class="value">' + fmt(t.income) + ' ₽</span></div>' +
+        '</div>';
+
+        html += '<div class="card" style="margin-bottom:12px;">' +
+            '<div class="card-title">Расходы</div>' +
+            '<div class="income-row"><span class="label"><span class="src-dot card"></span>💳 С карты</span>' +
+                '<span class="value">' + fmt(t.spentCard) + ' ₽</span></div>' +
+            '<div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Наличными</span>' +
+                '<span class="value">' + fmt(t.spentCash) + ' ₽</span></div>' +
+            '<div class="income-row total"><span class="label">Всего расход</span>' +
+                '<span class="value">' + fmt(t.spent) + ' ₽</span></div>' +
+        '</div>';
+
+        if (Math.abs(t.transferCard) > 0.001) {
+            const dir = t.transferCard > 0
+                ? '💳 → 💵 С карты на наличные'
+                : '💵 → 💳 С наличных на карту';
+            html += '<div class="card" style="margin-bottom:12px;">' +
+                '<div class="card-title">Переводы</div>' +
+                '<div class="income-row"><span class="label">' + dir + '</span>' +
+                    '<span class="value">' + fmt(Math.abs(t.transferCard)) + ' ₽</span></div>' +
+            '</div>';
+        }
+
+        html += '<div class="card" style="margin-bottom:12px;">' +
+            '<div class="card-title">Остаток на конец месяца</div>' +
+            '<div class="income-row"><span class="label"><span class="src-dot card"></span>💳 На карте</span>' +
+                '<span class="value"' + (t.balanceCard < 0 ? ' style="color:var(--minus);"' : '') + '>' +
+                    (t.balanceCard < 0 ? '−' : '') + fmt(Math.abs(t.balanceCard)) + ' ₽</span></div>' +
+            '<div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Наличные</span>' +
+                '<span class="value"' + (t.balanceCash < 0 ? ' style="color:var(--minus);"' : '') + '>' +
+                    (t.balanceCash < 0 ? '−' : '') + fmt(Math.abs(t.balanceCash)) + ' ₽</span></div>' +
+        '</div>';
+
+        html += '<div class="card" style="margin-bottom:12px;">' +
+            '<div class="card-title">План / факт по категориям</div>';
+
+        if (m.categories.length === 0) {
+            html += '<div class="empty-hint">В этом месяце не было пунктов плана</div>';
+        } else {
+            m.categories.forEach(cat => {
+                const plan = round2(cat.plan || 0);
+                const spent = catSpentTotal(cat);
+                const left = round2(plan - spent);
+                const count = (cat.expenses || []).length;
+                const cardS = catSpentCard(cat);
+                const cashS = catSpentCash(cat);
+
+                html += '<div style="padding:10px 0;border-bottom:1px solid var(--border);">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
+                        '<div style="min-width:0;flex:1;">' +
+                            '<div style="font-weight:600;color:var(--text);">' +
+                                escapeHtml(cat.name) +
+                                (count > 0 ? ' <span style="font-weight:400;font-size:11px;color:var(--muted);">(' + count + ')</span>' : '') +
+                            '</div>' +
+                            '<div style="font-size:12px;color:var(--muted);margin-top:2px;">' +
+                                'План ' + fmt(plan) + ' ₽ · Потрачено ' + fmt(spent) + ' ₽' +
+                            '</div>' +
+                        '</div>' +
+                        '<div style="text-align:right;flex-shrink:0;">' +
+                            '<div style="font-weight:600;color:' + (left < 0 ? 'var(--minus)' : 'var(--text)') + ';">' +
+                                (left < 0 ? 'Перерасход ' + fmt(Math.abs(left)) : 'Осталось ' + fmt(left)) + ' ₽' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>';
+
+                if (cardS > 0 || cashS > 0) {
+                    html += '<div class="src-mini" style="justify-content:flex-start;margin-top:4px;">' +
+                        (cardS > 0 ? '<span class="card">💳 ' + fmt(cardS) + ' ₽</span>' : '') +
+                        (cashS > 0 ? '<span class="cash">💵 ' + fmt(cashS) + ' ₽</span>' : '') +
+                    '</div>';
+                }
+
+                if (count > 0) {
+                    const sorted = [...cat.expenses].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+                    html += '<div style="margin-top:8px;padding:8px 10px;background:var(--soft);border-radius:10px;">';
+                    sorted.forEach(e => {
+                        html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:12px;">' +
+                            '<span style="color:var(--text);font-weight:500;">' + fmt(e.amount) + ' ₽</span>' +
+                            '<span style="color:var(--muted);display:flex;align-items:center;gap:6px;">' +
+                                '<span class="expense-log-src ' + (e.source === 'card' ? 'card' : 'cash') + '">' +
+                                    (e.source === 'card' ? '💳' : '💵') +
+                                '</span>' +
+                                '<span>' + (e.ts ? formatDateTime(e.ts) : '') + '</span>' +
+                            '</span>' +
+                        '</div>';
+                    });
+                    html += '</div>';
+                }
+
+                html += '</div>';
+            });
+        }
+
+        html += '</div>';
+
+        if (!isCurrent) {
+            html += '<div style="display:flex;gap:8px;margin-top:6px;">' +
+                '<button class="btn-secondary" id="copy-plan-btn" style="flex:1;">📋 Скопировать план</button>' +
+                '<button class="btn-secondary" id="copy-income-btn" style="flex:1;">💰 Скопировать доход</button>' +
+            '</div>';
+        }
+
+        box.innerHTML = html;
+
+        const copyPlanBtn = document.getElementById('copy-plan-btn');
+        const copyIncomeBtn = document.getElementById('copy-income-btn');
+        if (copyPlanBtn) copyPlanBtn.addEventListener('click', () => copyPlanFromMonth(key));
+        if (copyIncomeBtn) copyIncomeBtn.addEventListener('click', () => copyIncomeFromMonth(key));
+
+        openModal('month-view-modal');
+    }
+
+    function copyPlanFromMonth(sourceKey) {
+        const src = getMonth(sourceKey);
+        if (src.categories.length === 0) {
+            alert('В этом месяце нет пунктов плана для копирования');
+            return;
+        }
+        if (!confirm('Скопировать план (' + src.categories.length + ' пунктов) из ' +
+                     monthLabel(sourceKey) + ' в текущий месяц?\n' +
+                     'Существующие пункты плана в текущем месяце будут заменены. ' +
+                     'Расходы текущего месяца останутся.')) return;
+
+        const dst = getMonth(THIS_MONTH);
+        const spentByCard = {};
+        const spentByCash = {};
+        dst.categories.forEach(c => {
+            spentByCard[c.name] = catSpentCard(c);
+            spentByCash[c.name] = catSpentCash(c);
+        });
+
+        dst.categories = src.categories.map(c => ({
+            id: 'c' + Date.now() + Math.random().toString(36).slice(2, 6),
+            name: c.name,
+            plan: round2(c.plan || 0),
+            spentCard: spentByCard[c.name] || 0,
+            spentCash: spentByCash[c.name] || 0,
+            expenses: []
+        }));
+
+        save();
+        renderAll();
+        if (viewingMonthKey) openMonthView(viewingMonthKey);
+        alert('План скопирован в ' + monthLabel(THIS_MONTH));
+    }
+
+    function copyIncomeFromMonth(sourceKey) {
+        const src = getMonth(sourceKey);
+        const dst = getMonth(THIS_MONTH);
+
+        if (src.incomeCard === 0 && src.incomeCash === 0) {
+            alert('В этом месяце нет дохода для копирования');
+            return;
+        }
+        if (!confirm('Скопировать доход из ' + monthLabel(sourceKey) + ' в текущий месяц?\n' +
+                     '💳 На карте: ' + fmt(src.incomeCard) + ' ₽\n' +
+                     '💵 Наличными: ' + fmt(src.incomeCash) + ' ₽\n' +
+                     'Текущие доходы будут заменены.')) return;
+
+        dst.incomeCard = round2(src.incomeCard || 0);
+        dst.incomeCash = round2(src.incomeCash || 0);
+
+        save();
+        renderAll();
+        if (viewingMonthKey) openMonthView(viewingMonthKey);
+        alert('Доход скопирован в ' + monthLabel(THIS_MONTH));
+    }
+
     const inputIncomeCard = document.getElementById('input-income-card');
     const inputIncomeCash = document.getElementById('input-income-cash');
 
-    // Открыть окно редактирования дохода (при желании — с фокусом на нужное поле)
-    function openIncomeModal(focusField) {
+    document.getElementById('edit-income-btn').addEventListener('click', () => {
         const m = getMonth(THIS_MONTH);
         inputIncomeCard.value = m.incomeCard ? String(m.incomeCard).replace('.', ',') : '';
         inputIncomeCash.value = m.incomeCash ? String(m.incomeCash).replace('.', ',') : '';
         openModal('income-modal');
-        setTimeout(() => {
-            if (focusField === 'cash') inputIncomeCash.focus();
-            else inputIncomeCard.focus();
-        }, 150);
-    }
-
-    document.getElementById('edit-income-btn').addEventListener('click', () => openIncomeModal('card'));
-
-    // Клик по блоку "На карте" / "Наличные" в балансе
-    document.querySelectorAll('.src[data-edit-src]').forEach(el => {
-        el.addEventListener('click', function () {
-            const src = this.dataset.editSrc;
-            openIncomeModal(src === 'cash' ? 'cash' : 'card');
-        });
+        setTimeout(() => inputIncomeCard.focus(), 150);
     });
 
     document.getElementById('save-income').addEventListener('click', () => {
@@ -1348,9 +1714,71 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); closeModal('income-modal'); renderAll();
     });
 
-    /* ============================================================
-       КАТЕГОРИИ
-       ============================================================ */
+    const inputTransfer = document.getElementById('input-transfer');
+    const transferModalTitle = document.getElementById('transfer-modal-title');
+    const transferModalHint = document.getElementById('transfer-modal-hint');
+    const tcCard = document.getElementById('tc-card');
+    const tcCash = document.getElementById('tc-cash');
+
+    let transferDir = 'card2cash';
+
+    function setTransferDir(dir) {
+        transferDir = dir;
+        document.getElementById('dir-card-to-cash').classList.toggle('active', dir === 'card2cash');
+        document.getElementById('dir-cash-to-card').classList.toggle('active', dir === 'cash2card');
+        const btn1 = document.getElementById('dir-card-to-cash');
+        const btn2 = document.getElementById('dir-cash-to-card');
+        const parent = btn1.parentNode;
+        if (dir === 'card2cash') parent.insertBefore(btn1, btn2);
+        else parent.insertBefore(btn2, btn1);
+    }
+
+    document.getElementById('dir-card-to-cash').addEventListener('click', () => setTransferDir('card2cash'));
+    document.getElementById('dir-cash-to-card').addEventListener('click', () => setTransferDir('cash2card'));
+
+    function openTransferModal(fromSrc) {
+        const t = monthTotals(THIS_MONTH);
+        tcCard.textContent = fmt(t.balanceCard) + ' ₽';
+        tcCash.textContent = fmt(t.balanceCash) + ' ₽';
+        tcCard.classList.toggle('minus', t.balanceCard < 0);
+        tcCash.classList.toggle('minus', t.balanceCash < 0);
+
+        if (fromSrc === 'card') {
+            transferModalTitle.textContent = 'Перевод: с карты на наличные';
+            transferModalHint.innerHTML =
+                'Сняли деньги с карты? Переведите сумму — она станет наличными. ' +
+                'Например, сняли <b>5000 ₽</b> с карты → на наличных станет больше на 5000 ₽.';
+            setTransferDir('card2cash');
+        } else {
+            transferModalTitle.textContent = 'Перевод: с наличных на карту';
+            transferModalHint.innerHTML =
+                'Внесли наличные на карту? Переведите сумму — она станет деньгами на карте. ' +
+                'Например, внесли <b>3000 ₽</b> на карту → на карте станет больше на 3000 ₽.';
+            setTransferDir('cash2card');
+        }
+
+        inputTransfer.value = '';
+        openModal('transfer-modal');
+        setTimeout(() => inputTransfer.focus(), 150);
+    }
+
+    document.querySelectorAll('[data-transfer-src]').forEach(el => {
+        el.addEventListener('click', function () {
+            openTransferModal(this.dataset.transferSrc === 'cash' ? 'cash' : 'card');
+        });
+    });
+
+    document.getElementById('save-transfer').addEventListener('click', () => {
+        const amount = parseMoney(inputTransfer.value);
+        if (!amount) { alert('Введите сумму'); return; }
+        const m = getMonth(THIS_MONTH);
+        const delta = (transferDir === 'card2cash') ? amount : -amount;
+        m.transferCard = round2((m.transferCard || 0) + delta);
+        save();
+        closeModal('transfer-modal');
+        renderAll();
+    });
+
     let editingCatId = null;
     document.getElementById('add-category-btn').addEventListener('click', () => openCategoryModal(null));
 
@@ -1394,9 +1822,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); closeModal('category-modal'); editingCatId = null; renderAll();
     });
 
-    /* ============================================================
-       РАСХОД — ДОБАВЛЕНИЕ / РЕДАКТИРОВАНИЕ
-       ============================================================ */
     let expenseCatId = null;
     let editingExpenseId = null;
     let expenseSource = 'card';
@@ -1490,9 +1915,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderAll();
     });
 
-    /* ============================================================
-       СПИСОК РАСХОДОВ
-       ============================================================ */
     let logCatId = null;
 
     function recalcCategoryFromExpenses(cat) {
@@ -1596,9 +2018,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderAll();
     });
 
-    /* ============================================================
-       ЦЕЛИ — МОДАЛЬНЫЕ
-       ============================================================ */
     let editingGoalId = null;
     document.getElementById('add-goal-btn').addEventListener('click', () => openGoalModal(null));
     document.getElementById('info-goals-btn').addEventListener('click', () => {
@@ -1652,9 +2071,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); closeModal('goal-modal'); editingGoalId = null; renderAll();
     });
 
-    /* ============================================================
-       ПОПОЛНЕНИЕ ЦЕЛИ
-       ============================================================ */
     let addingToGoalId = null;
     function openGoalAddModal(id) {
         addingToGoalId = id;
@@ -1683,9 +2099,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         closeModal('goal-add-modal'); addingToGoalId = null; renderAll();
     });
 
-    /* ============================================================
-       МОДАЛЬНЫЕ ОКНА — ОБЩЕЕ
-       ============================================================ */
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
@@ -1698,9 +2111,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         });
     });
 
-    /* ============================================================
-       НАВИГАЦИЯ
-       ============================================================ */
     function goToPage(name) {
         document.querySelectorAll('.bottom-nav button').forEach(b => {
             b.classList.toggle('active', b.dataset.page === name);
@@ -1715,9 +2125,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     });
     document.getElementById('goto-goals-btn').addEventListener('click', () => goToPage('goals'));
 
-    /* ============================================================
-       ВНЕШНИЙ ВИД
-       ============================================================ */
     function applyAppearance() {
         document.body.className = 'accent-' + (state.accent || 'pink') + ' mode-' + (state.mode || 'light');
         document.querySelectorAll('.theme-dot').forEach(d => {
@@ -1738,14 +2145,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         state.mode = 'dark'; save(); applyAppearance();
     });
 
-    /* ============================================================
-       НАСТРОЙКИ
-       ============================================================ */
     document.getElementById('reset-month').addEventListener('click', () => {
         if (!confirm('Обнулить все расходы текущего месяца? Планы и доходы сохранятся.')) return;
-        getMonth(THIS_MONTH).categories.forEach(c => {
+        const m = getMonth(THIS_MONTH);
+        m.categories.forEach(c => {
             c.spentCard = 0; c.spentCash = 0; c.expenses = [];
         });
+        m.transferCard = 0;
         save(); renderAll();
     });
 
@@ -1757,8 +2163,67 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     });
 
     /* ============================================================
-       ОБЩИЙ РЕНДЕР
+       ЭКСПОРТ / ИМПОРТ ДАННЫХ
        ============================================================ */
+    document.getElementById('export-data').addEventListener('click', () => {
+        try {
+            const dataStr = JSON.stringify(state, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const d = new Date();
+            const stamp = d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+            a.href = url;
+            a.download = 'money_tochka_backup_' + stamp + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            alert('Не удалось экспортировать: ' + e.message);
+        }
+    });
+
+    document.getElementById('import-data-btn').addEventListener('click', () => {
+        document.getElementById('import-data-file').click();
+    });
+
+    document.getElementById('import-data-file').addEventListener('change', function (ev) {
+        const file = ev.target.files && ev.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (!parsed || typeof parsed !== 'object' || !parsed.months) {
+                    alert('Это не похоже на файл резервной копии Мани.точки.');
+                    return;
+                }
+                if (!confirm('Импортировать данные из файла?\n' +
+                             'Все текущие данные будут заменены.')) return;
+
+                state = Object.assign({
+                    accent: 'pink', mode: 'light', months: {}, goals: [], lastClosedMonth: null
+                }, parsed);
+                if (!state.goals) state.goals = [];
+                if (!state.months) state.months = {};
+                const THIS_MONTH_NOW = currentMonthKey();
+                if (!state.months[THIS_MONTH_NOW]) state.months[THIS_MONTH_NOW] = emptyMonth();
+                Object.keys(state.months).forEach(k => migrateMonth(state.months[k]));
+
+                save();
+                renderAll();
+                alert('Данные восстановлены');
+            } catch (err) {
+                alert('Ошибка чтения файла: ' + err.message);
+            }
+        };
+        reader.readAsText(file);
+        ev.target.value = '';
+    });
+
     function renderAll() {
         renderMain();
         renderStat();
@@ -1767,9 +2232,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         applyAppearance();
     }
 
-    /* ============================================================
-       СТАРТ
-       ============================================================ */
     closePastMonths();
     renderAll();
 
