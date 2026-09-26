@@ -195,6 +195,18 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .income-row .value { font-weight:700; font-size:17px; color:var(--text); }
 .income-row.total { background:var(--income-total-bg); }
 
+/* ====== СПИСОК ДОХОДОВ ПО НАЗВАНИЯМ ====== */
+.income-item {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 0; border-bottom:1px solid var(--border); gap:8px;
+}
+.income-item:last-child { border-bottom:none; }
+.income-item .ii-info { display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
+.income-item .ii-name { font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.income-item .ii-src { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:5px; }
+.income-item .ii-right { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.income-item .ii-amount { font-weight:700; color:var(--text); font-size:15px; }
+
 .btn-add {
     background:transparent; border:1px dashed var(--dashed); color:var(--muted);
     padding:12px; border-radius:40px; width:100%; font-size:15px; font-weight:500;
@@ -469,23 +481,14 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div id="main-goal-preview"></div>
         </div>
 
+        <!-- МОИ ДОХОДЫ — теперь со списком -->
         <div class="card">
             <div class="row-space-between mb-1">
                 <span class="card-title">Мои доходы</span>
-                <button class="icon-btn" id="edit-income-btn" title="Изменить доход">✎</button>
+                <span class="text-muted small" id="income-total-badge">0 ₽</span>
             </div>
-            <div class="income-row">
-                <span class="label"><span class="src-dot card"></span>💳 На карте</span>
-                <span class="value" id="income-card">0 ₽</span>
-            </div>
-            <div class="income-row">
-                <span class="label"><span class="src-dot cash"></span>💵 Наличными</span>
-                <span class="value" id="income-cash">0 ₽</span>
-            </div>
-            <div class="income-row total">
-                <span class="label">Всего доход</span>
-                <span class="value" id="income-total">0 ₽</span>
-            </div>
+            <div id="income-list"></div>
+            <button class="btn-add" id="add-income-btn">+ Добавить доход</button>
         </div>
     </div>
 
@@ -637,7 +640,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="settings-row"><span class="label">Валюта</span><span class="value">₽ (рубль)</span></div>
         </div>
 
-        <!-- Данные: экспорт/импорт -->
         <div class="card">
             <div class="card-title">Данные</div>
             <div class="text-muted small mb-1">
@@ -670,23 +672,29 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
 <!-- ====== МОДАЛЬНЫЕ ОКНА ====== -->
 
+<!-- Доход: название, сумма, источник -->
 <div class="modal-overlay" id="income-modal">
     <div class="modal">
-        <h3>Мои доходы за месяц</h3>
-        <div class="text-muted small mb-1">Здесь вы вводите сумму, которую получили. Это ваш основной доход.</div>
+        <h3 id="income-modal-title">Новый доход</h3>
         <div class="field">
-            <label>💳 На карте, ₽</label>
-            <input type="text" id="input-income-card" placeholder="0" inputmode="decimal" autocomplete="off">
+            <label>Название</label>
+            <input type="text" id="input-income-name" placeholder="Например: Зарплата, Подработка, Кэшбэк" maxlength="50">
+        </div>
+        <div class="field">
+            <label>Сумма, ₽</label>
+            <input type="text" id="input-income-amount" placeholder="0" inputmode="decimal" autocomplete="off">
             <div class="hint">Можно с копейками: например 1500,50</div>
         </div>
         <div class="field">
-            <label>💵 Наличными, ₽</label>
-            <input type="text" id="input-income-cash" placeholder="0" inputmode="decimal" autocomplete="off">
-            <div class="hint">Можно с копейками: например 300,75</div>
+            <label>Куда поступило</label>
+            <div class="source-picker">
+                <button type="button" data-income-src="card" class="card-src active" id="inc-src-card">💳 На карту</button>
+                <button type="button" data-income-src="cash" class="cash-src" id="inc-src-cash">💵 Наличными</button>
+            </div>
         </div>
         <div class="modal-actions">
             <button class="btn-secondary" data-close="income-modal">Отмена</button>
-            <button class="btn-primary" id="save-income">Сохранить доход</button>
+            <button class="btn-primary" id="save-income">Сохранить</button>
         </div>
     </div>
 </div>
@@ -857,30 +865,18 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
     /* ============================================================
        ХРАНИЛИЩЕ
-       Основной ключ — STORAGE_KEY. Он никогда не меняется.
-       При запуске, если по нему данных нет, ищем по всем старым
-       ключам и переносим в новый. Так данные сохраняются при
-       любой замене кода.
+       Один постоянный ключ + автопоиск по старым.
        ============================================================ */
-    const STORAGE_KEY = 'money_tochka'; // постоянный ключ
+    const STORAGE_KEY = 'money_tochka';
 
-    // Список старых ключей, которые встречались в предыдущих версиях.
-    // Порядок: от самого свежего к самому старому.
     const LEGACY_KEYS = [
-        'money_tochka_v10',
-        'money_tochka_v9',
-        'money_tochka_v8',
-        'money_tochka_v7',
-        'money_tochka_v6',
-        'money_tochka_v5',
-        'money_tochka_v4',
-        'money_tochka_v3',
-        'money_tochka_v2',
+        'money_tochka_v10', 'money_tochka_v9', 'money_tochka_v8',
+        'money_tochka_v7', 'money_tochka_v6', 'money_tochka_v5',
+        'money_tochka_v4', 'money_tochka_v3', 'money_tochka_v2',
         'money_tochka_v1'
     ];
 
     function loadState() {
-        // 1) Пробуем основной ключ
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
@@ -888,18 +884,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 if (parsed && parsed.months) return parsed;
             }
         } catch (e) {}
-
-        // 2) Если нет — ищем по старым ключам
         for (const k of LEGACY_KEYS) {
             try {
                 const raw = localStorage.getItem(k);
                 if (!raw) continue;
                 const parsed = JSON.parse(raw);
                 if (parsed && parsed.months) {
-                    // Переносим в основной ключ
                     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
-                    // Старый ключ не удаляем — на случай отката
-                    console.log('Данные перенесены из', k, 'в', STORAGE_KEY);
                     return parsed;
                 }
             } catch (e) {}
@@ -926,11 +917,12 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         return MONTHS_RU[m - 1].slice(0, 3).toLowerCase();
     }
 
+    // Новая структура месяца: incomes — массив доходов по названиям.
+    // Для совместимости поддерживаем и старые incomeCard/incomeCash.
     function emptyMonth() {
         return {
             categories: [],
-            incomeCard: 0,
-            incomeCash: 0,
+            incomes: [],       // [{id, name, amount, source}]
             transferCard: 0,
             closed: false
         };
@@ -944,11 +936,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         lastClosedMonth: null
     };
 
-    // Загружаем данные: основной ключ → старые ключи
     const loaded = loadState();
-    if (loaded) {
-        state = Object.assign(state, loaded);
-    }
+    if (loaded) state = Object.assign(state, loaded);
 
     if (!state.goals) state.goals = [];
     if (!state.months) state.months = {};
@@ -959,12 +948,35 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     if (!state.months[THIS_MONTH]) state.months[THIS_MONTH] = emptyMonth();
 
     function migrateMonth(m) {
-        if (!m || !m.categories) return;
-        if (typeof m.incomeCard !== 'number') m.incomeCard = 0;
-        if (typeof m.incomeCash !== 'number') m.incomeCash = 0;
+        if (!m) return;
+        if (!m.categories) m.categories = [];
+        if (!Array.isArray(m.incomes)) m.incomes = [];
         if (typeof m.transferCard !== 'number') m.transferCard = 0;
+
+        // Совместимость: если были старые incomeCard / incomeCash, превращаем их в записи
+        const oldCard = typeof m.incomeCard === 'number' ? m.incomeCard : 0;
+        const oldCash = typeof m.incomeCash === 'number' ? m.incomeCash : 0;
+        if (oldCard > 0 && !m.incomes.some(i => i.name === 'Доход на карте (старый)')) {
+            m.incomes.push({
+                id: 'i' + Date.now() + Math.random().toString(36).slice(2, 6),
+                name: 'Доход на карте',
+                amount: round2(oldCard),
+                source: 'card'
+            });
+        }
+        if (oldCash > 0 && !m.incomes.some(i => i.name === 'Доход наличными (старый)')) {
+            m.incomes.push({
+                id: 'i' + Date.now() + Math.random().toString(36).slice(2, 7),
+                name: 'Доход наличными',
+                amount: round2(oldCash),
+                source: 'cash'
+            });
+        }
+        delete m.incomeCard;
+        delete m.incomeCash;
         delete m.balanceCard;
         delete m.balanceCash;
+
         m.categories.forEach(c => {
             if (typeof c.spentCard !== 'number') c.spentCard = 0;
             if (typeof c.spentCash !== 'number') c.spentCash = 0;
@@ -1023,6 +1035,16 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     function catSpentCash(c) { return round2(c.spentCash || 0); }
     function catSpentTotal(c) { return round2(catSpentCard(c) + catSpentCash(c)); }
 
+    // Считаем доходы по источникам
+    function incomeTotals(m) {
+        let card = 0, cash = 0;
+        (m.incomes || []).forEach(i => {
+            if (i.source === 'cash') cash = round2(cash + (i.amount || 0));
+            else card = round2(card + (i.amount || 0));
+        });
+        return { card, cash, total: round2(card + cash) };
+    }
+
     function monthTotals(key) {
         const m = state.months[key];
         if (!m) return {
@@ -1032,9 +1054,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             transferCard:0
         };
 
-        const incomeCard = round2(m.incomeCard || 0);
-        const incomeCash = round2(m.incomeCash || 0);
-        const income = round2(incomeCard + incomeCash);
+        const inc = incomeTotals(m);
+        const incomeCard = inc.card;
+        const incomeCash = inc.cash;
+        const income = inc.total;
 
         let spentCard = 0, spentCash = 0;
         m.categories.forEach(c => {
@@ -1042,13 +1065,11 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             spentCash = round2(spentCash + catSpentCash(c));
         });
         const planned = round2(m.categories.reduce((s, c) => s + (c.plan || 0), 0));
-
         const transferCard = round2(m.transferCard || 0);
 
         const balanceCard = round2(incomeCard - spentCard - transferCard);
         const balanceCash = round2(incomeCash - spentCash + transferCard);
         const balance = round2(balanceCard + balanceCash);
-
         const spent = round2(spentCard + spentCash);
 
         return {
@@ -1115,6 +1136,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         balCashEl.classList.toggle('minus', t.balanceCash < 0);
 
         renderMainGoalPreview();
+        renderIncomeList();
 
         const list = document.getElementById('category-list');
         list.innerHTML = '';
@@ -1176,10 +1198,47 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 if (action === 'open-log') openExpenseLog(id);
             });
         });
+    }
 
-        document.getElementById('income-card').textContent = fmt(m.incomeCard) + ' ₽';
-        document.getElementById('income-cash').textContent = fmt(m.incomeCash) + ' ₽';
-        document.getElementById('income-total').textContent = fmt(t.income) + ' ₽';
+    /* ====== РЕНДЕР СПИСКА ДОХОДОВ ====== */
+    function renderIncomeList() {
+        const m = getMonth(THIS_MONTH);
+        const list = document.getElementById('income-list');
+        const inc = incomeTotals(m);
+        document.getElementById('income-total-badge').textContent = fmt(inc.total) + ' ₽';
+
+        list.innerHTML = '';
+        if (!m.incomes || m.incomes.length === 0) {
+            list.innerHTML = '<div class="empty-hint">Пока нет доходов.<br>Нажмите «+ Добавить доход» ниже.</div>';
+            return;
+        }
+
+        m.incomes.forEach(income => {
+            const div = document.createElement('div');
+            div.className = 'income-item';
+            const srcLabel = income.source === 'cash' ? '💵 Наличными' : '💳 На карту';
+            const srcClass = income.source === 'cash' ? 'cash' : 'card';
+            div.innerHTML =
+                '<div class="ii-info">' +
+                    '<span class="ii-name">' + escapeHtml(income.name || 'Доход') + '</span>' +
+                    '<span class="ii-src"><span class="src-dot ' + srcClass + '"></span>' + srcLabel + '</span>' +
+                '</div>' +
+                '<div class="ii-right">' +
+                    '<span class="ii-amount">' + fmt(income.amount) + ' ₽</span>' +
+                    '<button class="icon-btn" data-income-action="edit" data-id="' + income.id + '" title="Изменить">✎</button>' +
+                    '<button class="icon-btn" data-income-action="delete" data-id="' + income.id + '" title="Удалить">✕</button>' +
+                '</div>';
+            list.appendChild(div);
+        });
+
+        list.querySelectorAll('button[data-income-action]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = this.dataset.id;
+                const action = this.dataset.incomeAction;
+                if (action === 'edit') openIncomeModal(id);
+                if (action === 'delete') deleteIncome(id);
+            });
+        });
     }
 
     function renderMainGoalPreview() {
@@ -1520,14 +1579,27 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         html += '</div>';
 
+        // Доходы — по названиям
         html += '<div class="card" style="margin-bottom:12px;">' +
-            '<div class="card-title">Доходы</div>' +
-            '<div class="income-row"><span class="label"><span class="src-dot card"></span>💳 На карте</span>' +
-                '<span class="value">' + fmt(m.incomeCard) + ' ₽</span></div>' +
-            '<div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Наличными</span>' +
-                '<span class="value">' + fmt(m.incomeCash) + ' ₽</span></div>' +
-            '<div class="income-row total"><span class="label">Всего доход</span>' +
-                '<span class="value">' + fmt(t.income) + ' ₽</span></div>' +
+            '<div class="card-title">Доходы</div>';
+        if (!m.incomes || m.incomes.length === 0) {
+            html += '<div class="empty-hint">Доходов не было</div>';
+        } else {
+            m.incomes.forEach(i => {
+                const srcLabel = i.source === 'cash' ? '💵 Наличными' : '💳 На карту';
+                const srcClass = i.source === 'cash' ? 'cash' : 'card';
+                html += '<div class="income-item" style="border-bottom:1px solid var(--border);">' +
+                    '<div class="ii-info">' +
+                        '<span class="ii-name">' + escapeHtml(i.name || 'Доход') + '</span>' +
+                        '<span class="ii-src"><span class="src-dot ' + srcClass + '"></span>' + srcLabel + '</span>' +
+                    '</div>' +
+                    '<div class="ii-right"><span class="ii-amount">' + fmt(i.amount) + ' ₽</span></div>' +
+                '</div>';
+            });
+        }
+        html += '<div class="income-row total" style="margin-top:8px;">' +
+            '<span class="label">Всего доход</span>' +
+            '<span class="value">' + fmt(t.income) + ' ₽</span></div>' +
         '</div>';
 
         html += '<div class="card" style="margin-bottom:12px;">' +
@@ -1678,42 +1750,112 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         const src = getMonth(sourceKey);
         const dst = getMonth(THIS_MONTH);
 
-        if (src.incomeCard === 0 && src.incomeCash === 0) {
-            alert('В этом месяце нет дохода для копирования');
+        if (!src.incomes || src.incomes.length === 0) {
+            alert('В этом месяце нет доходов для копирования');
             return;
         }
-        if (!confirm('Скопировать доход из ' + monthLabel(sourceKey) + ' в текущий месяц?\n' +
-                     '💳 На карте: ' + fmt(src.incomeCard) + ' ₽\n' +
-                     '💵 Наличными: ' + fmt(src.incomeCash) + ' ₽\n' +
+        const incSrc = incomeTotals(src);
+        if (!confirm('Скопировать доходы из ' + monthLabel(sourceKey) + ' в текущий месяц?\n' +
+                     'Записей: ' + src.incomes.length + '\n' +
+                     'Всего: ' + fmt(incSrc.total) + ' ₽\n' +
                      'Текущие доходы будут заменены.')) return;
 
-        dst.incomeCard = round2(src.incomeCard || 0);
-        dst.incomeCash = round2(src.incomeCash || 0);
+        // Копируем записи как есть, с новыми id
+        dst.incomes = src.incomes.map(i => ({
+            id: 'i' + Date.now() + Math.random().toString(36).slice(2, 6),
+            name: i.name || 'Доход',
+            amount: round2(i.amount || 0),
+            source: i.source === 'cash' ? 'cash' : 'card'
+        }));
 
         save();
         renderAll();
         if (viewingMonthKey) openMonthView(viewingMonthKey);
-        alert('Доход скопирован в ' + monthLabel(THIS_MONTH));
+        alert('Доходы скопированы в ' + monthLabel(THIS_MONTH));
     }
 
-    const inputIncomeCard = document.getElementById('input-income-card');
-    const inputIncomeCash = document.getElementById('input-income-cash');
+    /* ============================================================
+       МОДАЛЬНОЕ ОКНО ДОХОДА (новая запись / редактирование)
+       ============================================================ */
+    let editingIncomeId = null;
+    let incomeSourceDraft = 'card';
 
-    document.getElementById('edit-income-btn').addEventListener('click', () => {
+    function setIncomeSource(src) {
+        incomeSourceDraft = src;
+        document.getElementById('inc-src-card').classList.toggle('active', src === 'card');
+        document.getElementById('inc-src-cash').classList.toggle('active', src === 'cash');
+    }
+    document.getElementById('inc-src-card').addEventListener('click', () => setIncomeSource('card'));
+    document.getElementById('inc-src-cash').addEventListener('click', () => setIncomeSource('cash'));
+
+    function openIncomeModal(id) {
+        editingIncomeId = id;
         const m = getMonth(THIS_MONTH);
-        inputIncomeCard.value = m.incomeCard ? String(m.incomeCard).replace('.', ',') : '';
-        inputIncomeCash.value = m.incomeCash ? String(m.incomeCash).replace('.', ',') : '';
+        const titleEl = document.getElementById('income-modal-title');
+        const nameInp = document.getElementById('input-income-name');
+        const amountInp = document.getElementById('input-income-amount');
+
+        if (id) {
+            const item = (m.incomes || []).find(i => i.id === id);
+            if (!item) return;
+            titleEl.textContent = 'Изменить доход';
+            nameInp.value = item.name || '';
+            amountInp.value = item.amount ? String(item.amount).replace('.', ',') : '';
+            setIncomeSource(item.source === 'cash' ? 'cash' : 'card');
+        } else {
+            titleEl.textContent = 'Новый доход';
+            nameInp.value = '';
+            amountInp.value = '';
+            setIncomeSource('card');
+        }
         openModal('income-modal');
-        setTimeout(() => inputIncomeCard.focus(), 150);
-    });
+        setTimeout(() => nameInp.focus(), 150);
+    }
+
+    document.getElementById('add-income-btn').addEventListener('click', () => openIncomeModal(null));
 
     document.getElementById('save-income').addEventListener('click', () => {
+        const name = document.getElementById('input-income-name').value.trim();
+        const amount = parseMoney(document.getElementById('input-income-amount').value);
+
+        if (!name) { alert('Введите название дохода'); return; }
+        if (!amount) { alert('Введите сумму'); return; }
+
         const m = getMonth(THIS_MONTH);
-        m.incomeCard = parseMoney(inputIncomeCard.value);
-        m.incomeCash = parseMoney(inputIncomeCash.value);
-        save(); closeModal('income-modal'); renderAll();
+        if (!m.incomes) m.incomes = [];
+
+        if (editingIncomeId) {
+            const item = m.incomes.find(i => i.id === editingIncomeId);
+            if (item) {
+                item.name = name;
+                item.amount = amount;
+                item.source = incomeSourceDraft;
+            }
+        } else {
+            m.incomes.push({
+                id: 'i' + Date.now() + Math.random().toString(36).slice(2, 6),
+                name: name,
+                amount: amount,
+                source: incomeSourceDraft
+            });
+        }
+        save();
+        closeModal('income-modal');
+        editingIncomeId = null;
+        renderAll();
     });
 
+    function deleteIncome(id) {
+        const m = getMonth(THIS_MONTH);
+        const item = (m.incomes || []).find(i => i.id === id);
+        if (!item) return;
+        if (!confirm('Удалить доход «' + (item.name || 'Доход') + '»?')) return;
+        m.incomes = m.incomes.filter(i => i.id !== id);
+        save();
+        renderAll();
+    }
+
+    /* ====== Перевод ====== */
     const inputTransfer = document.getElementById('input-transfer');
     const transferModalTitle = document.getElementById('transfer-modal-title');
     const transferModalHint = document.getElementById('transfer-modal-hint');
@@ -1779,6 +1921,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderAll();
     });
 
+    /* ====== Категории ====== */
     let editingCatId = null;
     document.getElementById('add-category-btn').addEventListener('click', () => openCategoryModal(null));
 
@@ -1822,6 +1965,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); closeModal('category-modal'); editingCatId = null; renderAll();
     });
 
+    /* ====== Расходы ====== */
     let expenseCatId = null;
     let editingExpenseId = null;
     let expenseSource = 'card';
@@ -2018,6 +2162,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderAll();
     });
 
+    /* ====== Цели ====== */
     let editingGoalId = null;
     document.getElementById('add-goal-btn').addEventListener('click', () => openGoalModal(null));
     document.getElementById('info-goals-btn').addEventListener('click', () => {
@@ -2099,6 +2244,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         closeModal('goal-add-modal'); addingToGoalId = null; renderAll();
     });
 
+    /* ====== Общие модалки ====== */
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
@@ -2162,9 +2308,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); renderAll();
     });
 
-    /* ============================================================
-       ЭКСПОРТ / ИМПОРТ ДАННЫХ
-       ============================================================ */
     document.getElementById('export-data').addEventListener('click', () => {
         try {
             const dataStr = JSON.stringify(state, null, 2);
@@ -2201,8 +2344,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                     alert('Это не похоже на файл резервной копии Мани.точки.');
                     return;
                 }
-                if (!confirm('Импортировать данные из файла?\n' +
-                             'Все текущие данные будут заменены.')) return;
+                if (!confirm('Импортировать данные из файла?\nВсе текущие данные будут заменены.')) return;
 
                 state = Object.assign({
                     accent: 'pink', mode: 'light', months: {}, goals: [], lastClosedMonth: null
