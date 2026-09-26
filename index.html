@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Мани.точка</title>
+<title>Maney</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
 
@@ -38,7 +38,6 @@ body.mode-light {
     --input-bg:#ffffff; --input-border:#dddae8; --chart-prev:#b197fc;
     --income-bg:#f6f4fb; --income-total-bg:#f0f4fe; --body-bg:#f4f2f7;
     --modal-bg:#ffffff; --reset-bg:#fef0f0; --reset-text:#c44a4a; --dashed:#c8c4d4;
-    --card-src:#6c9bff; --cash-src:#3bc9a3;
 }
 
 body.mode-dark {
@@ -49,7 +48,6 @@ body.mode-dark {
     --input-bg:#2a2634; --input-border:#3d3749; --chart-prev:#7c6bb0;
     --income-bg:#2a2634; --income-total-bg:#2b2a45; --body-bg:#0f0d14;
     --modal-bg:#221f2b; --reset-bg:#3a2226; --reset-text:#ff8a8c; --dashed:#4a4458;
-    --card-src:#6c9bff; --cash-src:#3bc9a3;
 }
 
 body { background: var(--body-bg); }
@@ -63,8 +61,11 @@ body { background: var(--body-bg); }
 .header h1 { font-size:24px; font-weight:700; color:var(--text); letter-spacing:-.3px; }
 .header h1 span { color:var(--primary); }
 .header .user-icon {
-    background:var(--primary); color:#fff; width:40px; height:40px; border-radius:40px;
-    display:flex; align-items:center; justify-content:center; font-weight:600; font-size:18px; opacity:.9;
+    background:var(--primary); color:#fff; min-width:40px; height:40px; padding:0 10px;
+    border-radius:40px;
+    display:flex; align-items:center; justify-content:center; font-weight:600; font-size:15px; opacity:.95;
+    cursor:pointer;
+    max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 
 .card {
@@ -102,8 +103,8 @@ body { background: var(--body-bg); }
     box-sizing: border-box;
     align-self: center;
 }
-.src-dot.card { background: var(--card-src) !important; }
-.src-dot.cash { background: var(--cash-src) !important; }
+.src-dot.card { background: #6c9bff !important; }
+.src-dot.cash { background: #3bc9a3 !important; }
 
 .src-label-row {
     display: flex;
@@ -116,26 +117,36 @@ body { background: var(--body-bg); }
     min-height: 16px;
 }
 
-.balance-split { display:flex; gap:10px; margin-top:12px; }
-.balance-split .src {
-    flex:1; background:var(--soft); border-radius:14px; padding:10px 12px;
+.balance-sources {
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:10px;
+    margin-top:12px;
+}
+.balance-sources .src {
+    background:var(--soft); border-radius:14px; padding:10px 12px;
     display:flex; flex-direction:column; gap:3px;
     cursor:pointer; transition:.15s; position:relative;
-    border:2px solid transparent;
+    border:2px solid transparent; min-height:74px;
 }
-.balance-split .src:hover {
+.balance-sources .src:hover {
     background:var(--soft-hover);
     border-color:var(--primary);
 }
-.balance-split .src:active { transform:scale(.98); }
-.balance-split .src .src-value { font-size:16px; font-weight:700; color:var(--text); }
-.balance-split .src .src-value.minus { color:var(--minus); }
-
-.balance-split .src .edit-badge {
+.balance-sources .src:active { transform:scale(.98); }
+.balance-sources .src .src-value { font-size:16px; font-weight:700; color:var(--text); margin-top:auto; }
+.balance-sources .src .src-value.minus { color:var(--minus); }
+.balance-sources .src .src-name {
+    font-size:12px; color:var(--muted);
+    display:flex; align-items:center; gap:6px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.balance-sources .src .edit-badge {
     position:absolute; top:8px; right:8px;
     font-size:11px; opacity:.5;
     color:var(--muted);
 }
+.balance-sources .empty-hint { grid-column: 1 / -1; }
 
 .plan-summary { display:flex; gap:8px; margin-top:14px; }
 .plan-summary .p {
@@ -170,9 +181,9 @@ body { background: var(--body-bg); }
 .src-mini span {
     font-size:10px; padding:1px 6px; border-radius:10px; font-weight:600;
     background:var(--soft); color:var(--muted); white-space:nowrap;
+    display:inline-flex; align-items:center; gap:4px;
 }
-.src-mini span.card { color:var(--card-src); }
-.src-mini span.cash { color:var(--cash-src); }
+.src-mini span .src-dot { width:6px !important; height:6px !important; min-width:6px !important; min-height:6px !important; max-width:6px !important; max-height:6px !important; }
 
 .icon-btn {
     background:var(--soft); border:none; width:30px; height:30px; border-radius:50%;
@@ -195,7 +206,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .income-row .value { font-weight:700; font-size:17px; color:var(--text); }
 .income-row.total { background:var(--income-total-bg); }
 
-/* ====== СПИСОК ДОХОДОВ ПО НАЗВАНИЯМ ====== */
 .income-item {
     display:flex; justify-content:space-between; align-items:center;
     padding:10px 0; border-bottom:1px solid var(--border); gap:8px;
@@ -254,6 +264,11 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .settings-row:last-child { border-bottom:none; }
 .settings-row .label { color:var(--text); font-weight:450; }
 .settings-row .value { color:var(--muted); text-align:right; }
+.settings-row .value.editable {
+    cursor:pointer;
+    color:var(--primary);
+    font-weight:600;
+}
 
 .history-row {
     display:flex; justify-content:space-between; align-items:center;
@@ -301,6 +316,40 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .field input::placeholder { color:var(--muted); opacity:.6; }
 .field .hint { font-size:11px; color:var(--muted); margin-top:4px; padding-left:4px; opacity:.8; }
 
+.source-picker-dynamic {
+    display:flex; flex-wrap:wrap; gap:8px;
+}
+.source-picker-dynamic button {
+    flex:1 1 calc(50% - 4px);
+    min-width:0;
+    border:2px solid var(--input-border); background:var(--input-bg);
+    color:var(--text); padding:10px 10px; border-radius:14px;
+    font-size:13px; font-weight:600; cursor:pointer; transition:.18s;
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.source-picker-dynamic button:hover { border-color:var(--primary); }
+.source-picker-dynamic button.active {
+    border-color:var(--primary);
+    background:var(--primary);
+    color:#fff;
+}
+.source-picker-dynamic button.active .src-dot {
+    background:#fff !important;
+    opacity:.85;
+}
+.source-picker-dynamic .add-src-btn {
+    flex:1 1 100%;
+    border-style:dashed;
+    color:var(--muted);
+    background:transparent;
+}
+.source-picker-dynamic .add-src-btn:hover {
+    background:var(--soft);
+    border-color:var(--primary);
+    color:var(--primary);
+}
+
 .source-picker { display:flex; gap:8px; }
 .source-picker button {
     flex:1; border:2px solid var(--input-border); background:var(--input-bg);
@@ -310,16 +359,17 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 }
 .source-picker button:hover { border-color:var(--primary); }
 .source-picker button.active { border-color:var(--primary); background:var(--primary); color:#fff; }
-.source-picker button.active.card-src { border-color:var(--card-src); background:var(--card-src); }
-.source-picker button.active.cash-src { border-color:var(--cash-src); background:var(--cash-src); }
+.source-picker button.active.card-src { border-color:#6c9bff; background:#6c9bff; }
+.source-picker button.active.cash-src { border-color:#3bc9a3; background:#3bc9a3; }
 
-.transfer-current { display:flex; gap:8px; margin-bottom:14px; }
+.transfer-current { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
 .transfer-current .tc {
-    flex:1; background:var(--soft); border-radius:14px; padding:10px 12px;
+    flex:1 1 calc(50% - 4px);
+    background:var(--soft); border-radius:14px; padding:10px 12px;
     display:flex; flex-direction:column; gap:4px;
 }
-.transfer-current .tc .tc-label { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:5px; }
-.transfer-current .tc .tc-value { font-size:16px; font-weight:700; color:var(--text); }
+.transfer-current .tc .tc-label { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.transfer-current .tc .tc-value { font-size:15px; font-weight:700; color:var(--text); }
 
 .modal-overlay {
     position:fixed; inset:0; background:rgba(0,0,0,.45);
@@ -351,9 +401,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .expense-log-src {
     font-size:10px; padding:2px 8px; border-radius:10px; font-weight:600;
     background:var(--soft);
+    display:inline-flex; align-items:center; gap:4px;
 }
-.expense-log-src.card { color:var(--card-src); }
-.expense-log-src.cash { color:var(--cash-src); }
+.expense-log-src .src-dot { width:6px !important; height:6px !important; min-width:6px !important; min-height:6px !important; max-width:6px !important; max-height:6px !important; }
 
 .expense-log-actions { display:flex; gap:6px; flex-shrink:0; }
 
@@ -373,12 +423,14 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 }
 .expense-delete-btn:hover { opacity:.75; }
 
-.expense-log-summary { display:flex; gap:8px; margin-bottom:14px; }
+.expense-log-summary { display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
 .expense-log-summary .s {
-    flex:1; background:var(--soft); border-radius:12px; padding:8px 10px;
+    flex:1 1 calc(50% - 3px);
+    min-width:0;
+    background:var(--soft); border-radius:12px; padding:8px 10px;
     display:flex; flex-direction:column; gap:2px;
 }
-.expense-log-summary .s .l { font-size:11px; color:var(--muted); }
+.expense-log-summary .s .l { font-size:11px; color:var(--muted); display:flex; align-items:center; gap:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .expense-log-summary .s .v { font-size:14px; font-weight:700; color:var(--text); }
 
 .empty-hint { text-align:center; color:var(--muted); font-size:13px; padding:14px 0; }
@@ -435,8 +487,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
     <div class="page active" id="page-main">
         <div class="header">
-            <h1>Мани.<span>точка</span></h1>
-            <div class="user-icon">M</div>
+            <h1>Man<span>ey</span></h1>
+            <div class="user-icon" id="user-icon" title="Профиль"></div>
         </div>
 
         <div class="card">
@@ -444,24 +496,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-amount" id="balance-amount">0 <small>₽</small></div>
             <div class="card-sub" id="balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
 
-            <div class="balance-split">
-                <div class="src" data-transfer-src="card" title="Нажмите, чтобы перевести деньги">
-                    <span class="edit-badge">⇄</span>
-                    <span class="src-label-row">
-                        <span class="src-dot card"></span>
-                        <span>💳 На карте</span>
-                    </span>
-                    <span class="src-value" id="balance-card">0 ₽</span>
-                </div>
-                <div class="src" data-transfer-src="cash" title="Нажмите, чтобы перевести деньги">
-                    <span class="edit-badge">⇄</span>
-                    <span class="src-label-row">
-                        <span class="src-dot cash"></span>
-                        <span>💵 Наличные</span>
-                    </span>
-                    <span class="src-value" id="balance-cash">0 ₽</span>
-                </div>
-            </div>
+            <div class="balance-sources" id="balance-sources"></div>
         </div>
 
         <div class="card">
@@ -481,7 +516,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div id="main-goal-preview"></div>
         </div>
 
-        <!-- МОИ ДОХОДЫ — теперь со списком -->
         <div class="card">
             <div class="row-space-between mb-1">
                 <span class="card-title">Мои доходы</span>
@@ -528,24 +562,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-title">Баланс месяца</div>
             <div class="card-amount" id="stat-balance">0 <small>₽</small></div>
             <div class="card-sub" id="stat-balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
-            <div class="balance-split">
-                <div class="src" data-transfer-src="card" title="Перевести деньги">
-                    <span class="edit-badge">⇄</span>
-                    <span class="src-label-row">
-                        <span class="src-dot card"></span>
-                        <span>💳 Карта</span>
-                    </span>
-                    <span class="src-value" id="stat-balance-card">0 ₽</span>
-                </div>
-                <div class="src" data-transfer-src="cash" title="Перевести деньги">
-                    <span class="edit-badge">⇄</span>
-                    <span class="src-label-row">
-                        <span class="src-dot cash"></span>
-                        <span>💵 Наличные</span>
-                    </span>
-                    <span class="src-value" id="stat-balance-cash">0 ₽</span>
-                </div>
-            </div>
+            <div class="balance-sources" id="stat-balance-sources"></div>
         </div>
 
         <div class="card">
@@ -555,13 +572,15 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         <div class="card">
             <div class="card-title">Доходы и расходы</div>
-            <div class="income-row"><span class="label"><span class="src-dot card"></span>💳 Доход на карте</span><span class="value" id="stat-income-card">0 ₽</span></div>
-            <div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Доход наличными</span><span class="value" id="stat-income-cash">0 ₽</span></div>
-            <div class="income-row total"><span class="label">Всего доход</span><span class="value" id="stat-income-total">0 ₽</span></div>
-
-            <div class="income-row" style="margin-top:10px;"><span class="label"><span class="src-dot card"></span>💳 Расход с карты</span><span class="value" id="stat-spent-card">0 ₽</span></div>
-            <div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Расход наличными</span><span class="value" id="stat-spent-cash">0 ₽</span></div>
-            <div class="income-row total"><span class="label">Всего расход</span><span class="value" id="stat-spent-total">0 ₽</span></div>
+            <div id="stat-income-rows"></div>
+            <div class="income-row total" style="margin-top:8px;">
+                <span class="label">Всего доход</span>
+                <span class="value" id="stat-income-total">0 ₽</span>
+            </div>
+            <div class="income-row" style="margin-top:10px;">
+                <span class="label">Всего расход</span>
+                <span class="value" id="stat-spent-total">0 ₽</span>
+            </div>
         </div>
     </div>
 
@@ -636,7 +655,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         <div class="card">
             <div class="card-title">Профиль</div>
-            <div class="settings-row"><span class="label">Имя</span><span class="value">Mirai</span></div>
+            <div class="settings-row">
+                <span class="label">Имя</span>
+                <span class="value editable" id="user-name-value">не задано ✎</span>
+            </div>
             <div class="settings-row"><span class="label">Валюта</span><span class="value">₽ (рубль)</span></div>
         </div>
 
@@ -672,7 +694,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
 <!-- ====== МОДАЛЬНЫЕ ОКНА ====== -->
 
-<!-- Доход: название, сумма, источник -->
+<!-- Доход -->
 <div class="modal-overlay" id="income-modal">
     <div class="modal">
         <h3 id="income-modal-title">Новый доход</h3>
@@ -687,10 +709,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         </div>
         <div class="field">
             <label>Куда поступило</label>
-            <div class="source-picker">
-                <button type="button" data-income-src="card" class="card-src active" id="inc-src-card">💳 На карту</button>
-                <button type="button" data-income-src="cash" class="cash-src" id="inc-src-cash">💵 Наличными</button>
-            </div>
+            <div class="source-picker-dynamic" id="income-source-picker"></div>
+            <div class="hint">Это будет источник в балансе месяца. Например «Сбербанк», «Тинькофф», «Наличные».</div>
         </div>
         <div class="modal-actions">
             <button class="btn-secondary" data-close="income-modal">Отмена</button>
@@ -699,30 +719,48 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
+<!-- Новый источник -->
+<div class="modal-overlay" id="source-modal">
+    <div class="modal">
+        <h3 id="source-modal-title">Новый источник</h3>
+        <div class="text-muted small mb-1" id="source-modal-hint">
+            Назовите источник — например «Сбербанк», «Тинькофф», «Альфа» или «Наличные».
+        </div>
+        <div class="field">
+            <label>Название источника</label>
+            <input type="text" id="input-source-name" placeholder="Например: Сбербанк" maxlength="30">
+        </div>
+        <div class="field">
+            <label>Тип</label>
+            <div class="source-picker">
+                <button type="button" id="src-type-card" class="card-src active">💳 Карта</button>
+                <button type="button" id="src-type-cash" class="cash-src">💵 Наличные</button>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" data-close="source-modal">Отмена</button>
+            <button class="btn-primary" id="save-source">Создать</button>
+        </div>
+    </div>
+</div>
+
+<!-- Перевод -->
 <div class="modal-overlay" id="transfer-modal">
     <div class="modal">
         <h3 id="transfer-modal-title">Перевод</h3>
         <div class="text-muted small mb-1" id="transfer-modal-hint">
-            Перекиньте деньги между картой и наличными. Например, сняли с карты — стали наличными.
+            Перекиньте деньги между источниками.
         </div>
 
-        <div class="transfer-current">
-            <div class="tc">
-                <span class="tc-label"><span class="src-dot card"></span>💳 На карте</span>
-                <span class="tc-value" id="tc-card">0 ₽</span>
-            </div>
-            <div class="tc">
-                <span class="tc-label"><span class="src-dot cash"></span>💵 Наличные</span>
-                <span class="tc-value" id="tc-cash">0 ₽</span>
-            </div>
-        </div>
+        <div class="transfer-current" id="transfer-current"></div>
 
         <div class="field">
-            <label>Направление перевода</label>
-            <div class="source-picker">
-                <button type="button" id="dir-card-to-cash" class="active">💳 → 💵 С карты на наличные</button>
-                <button type="button" id="dir-cash-to-card">💵 → 💳 С наличных на карту</button>
-            </div>
+            <label>Откуда</label>
+            <div class="source-picker-dynamic" id="transfer-from-picker"></div>
+        </div>
+        <div class="field">
+            <label>Куда</label>
+            <div class="source-picker-dynamic" id="transfer-to-picker"></div>
         </div>
 
         <div class="field">
@@ -757,6 +795,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
+<!-- Расход -->
 <div class="modal-overlay" id="expense-modal">
     <div class="modal">
         <h3 id="expense-modal-title">Добавить расход</h3>
@@ -767,10 +806,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         </div>
         <div class="field">
             <label>Откуда списали</label>
-            <div class="source-picker">
-                <button type="button" data-source="card" class="card-src active" id="src-card">💳 С карты</button>
-                <button type="button" data-source="cash" class="cash-src" id="src-cash">💵 С налички</button>
-            </div>
+            <div class="source-picker-dynamic" id="expense-source-picker"></div>
             <div class="hint" id="expense-balance-hint"></div>
         </div>
         <div class="modal-actions">
@@ -783,20 +819,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 <div class="modal-overlay" id="expense-list-modal">
     <div class="modal">
         <h3 id="expense-list-title">Расходы</h3>
-        <div class="expense-log-summary">
-            <div class="s">
-                <span class="l">💳 С карты</span>
-                <span class="v" id="log-sum-card">0 ₽</span>
-            </div>
-            <div class="s">
-                <span class="l">💵 Наличные</span>
-                <span class="v" id="log-sum-cash">0 ₽</span>
-            </div>
-            <div class="s">
-                <span class="l">Всего</span>
-                <span class="v" id="log-sum-total">0 ₽</span>
-            </div>
-        </div>
+        <div class="expense-log-summary" id="expense-log-summary"></div>
 
         <div class="text-muted small mb-1">✎ — изменить запись, 🗑 — удалить её.</div>
         <div id="expense-log-list"></div>
@@ -859,16 +882,27 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
+<!-- Изменение имени пользователя -->
+<div class="modal-overlay" id="username-modal">
+    <div class="modal">
+        <h3>Ваше имя</h3>
+        <div class="text-muted small mb-1">Оно показывается в шапке приложения. Можно изменить в любой момент.</div>
+        <div class="field">
+            <label>Имя</label>
+            <input type="text" id="input-username" placeholder="Например: Mirai" maxlength="30">
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" data-close="username-modal">Отмена</button>
+            <button class="btn-primary" id="save-username">Сохранить</button>
+        </div>
+    </div>
+</div>
+
 <script>
 (function () {
     'use strict';
 
-    /* ============================================================
-       ХРАНИЛИЩЕ
-       Один постоянный ключ + автопоиск по старым.
-       ============================================================ */
     const STORAGE_KEY = 'money_tochka';
-
     const LEGACY_KEYS = [
         'money_tochka_v10', 'money_tochka_v9', 'money_tochka_v8',
         'money_tochka_v7', 'money_tochka_v6', 'money_tochka_v5',
@@ -917,18 +951,18 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         return MONTHS_RU[m - 1].slice(0, 3).toLowerCase();
     }
 
-    // Новая структура месяца: incomes — массив доходов по названиям.
-    // Для совместимости поддерживаем и старые incomeCard/incomeCash.
     function emptyMonth() {
         return {
+            sources: [],
+            incomes: [],
             categories: [],
-            incomes: [],       // [{id, name, amount, source}]
-            transferCard: 0,
+            transfers: [],
             closed: false
         };
     }
 
     let state = {
+        userName: '',
         accent: 'pink',
         mode: 'light',
         months: {},
@@ -943,44 +977,100 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     if (!state.months) state.months = {};
     if (!state.accent) state.accent = 'pink';
     if (!state.mode) state.mode = 'light';
+    if (typeof state.userName !== 'string') state.userName = '';
 
     const THIS_MONTH = currentMonthKey();
     if (!state.months[THIS_MONTH]) state.months[THIS_MONTH] = emptyMonth();
 
+    function newId(prefix) {
+        return (prefix || 'x') + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    }
+
     function migrateMonth(m) {
         if (!m) return;
-        if (!m.categories) m.categories = [];
-        if (!Array.isArray(m.incomes)) m.incomes = [];
-        if (typeof m.transferCard !== 'number') m.transferCard = 0;
 
-        // Совместимость: если были старые incomeCard / incomeCash, превращаем их в записи
+        if (!Array.isArray(m.sources)) m.sources = [];
+        if (!Array.isArray(m.incomes)) m.incomes = [];
+        if (!Array.isArray(m.categories)) m.categories = [];
+        if (!Array.isArray(m.transfers)) m.transfers = [];
+
+        m.sources.forEach(s => {
+            if (!s.id) s.id = newId('s');
+            if (!s.name) s.name = s.type === 'cash' ? 'Наличные' : 'Карта';
+            if (s.type !== 'card' && s.type !== 'cash') s.type = 'card';
+        });
+
         const oldCard = typeof m.incomeCard === 'number' ? m.incomeCard : 0;
         const oldCash = typeof m.incomeCash === 'number' ? m.incomeCash : 0;
-        if (oldCard > 0 && !m.incomes.some(i => i.name === 'Доход на карте (старый)')) {
-            m.incomes.push({
-                id: 'i' + Date.now() + Math.random().toString(36).slice(2, 6),
-                name: 'Доход на карте',
-                amount: round2(oldCard),
-                source: 'card'
-            });
+        if (oldCard > 0) {
+            let src = m.sources.find(s => s.name === 'Карта' && s.type === 'card');
+            if (!src) { src = { id: newId('s'), name: 'Карта', type: 'card' }; m.sources.push(src); }
+            m.incomes.push({ id: newId('i'), name: 'Доход на карте', amount: round2(oldCard), sourceId: src.id });
         }
-        if (oldCash > 0 && !m.incomes.some(i => i.name === 'Доход наличными (старый)')) {
-            m.incomes.push({
-                id: 'i' + Date.now() + Math.random().toString(36).slice(2, 7),
-                name: 'Доход наличными',
-                amount: round2(oldCash),
-                source: 'cash'
-            });
+        if (oldCash > 0) {
+            let src = m.sources.find(s => s.name === 'Наличные' && s.type === 'cash');
+            if (!src) { src = { id: newId('s'), name: 'Наличные', type: 'cash' }; m.sources.push(src); }
+            m.incomes.push({ id: newId('i'), name: 'Доход наличными', amount: round2(oldCash), sourceId: src.id });
         }
+
+        m.incomes.forEach(i => {
+            if (!i.id) i.id = newId('i');
+            if (!i.name) i.name = 'Доход';
+            if (i.amount == null) i.amount = 0;
+            if (i.sourceId) return;
+            const oldSrc = i.source === 'cash' ? 'cash' : 'card';
+            const name = oldSrc === 'cash' ? 'Наличные' : 'Карта';
+            let src = m.sources.find(s => s.type === oldSrc && s.name === name);
+            if (!src) {
+                src = { id: newId('s'), name: name, type: oldSrc };
+                m.sources.push(src);
+            }
+            i.sourceId = src.id;
+            delete i.source;
+        });
+
+        m.categories.forEach(c => {
+            if (!c.id) c.id = newId('c');
+            if (!Array.isArray(c.expenses)) c.expenses = [];
+            if (typeof c.plan !== 'number') c.plan = 0;
+        });
+
+        const oldTransfer = typeof m.transferCard === 'number' ? m.transferCard : 0;
+        if (oldTransfer !== 0 && m.transfers.length === 0) {
+            const cardSrc = m.sources.find(s => s.type === 'card');
+            const cashSrc = m.sources.find(s => s.type === 'cash');
+            if (cardSrc && cashSrc) {
+                if (oldTransfer > 0) {
+                    m.transfers.push({ id: newId('t'), fromId: cardSrc.id, toId: cashSrc.id, amount: round2(oldTransfer), ts: Date.now() });
+                } else {
+                    m.transfers.push({ id: newId('t'), fromId: cashSrc.id, toId: cardSrc.id, amount: round2(-oldTransfer), ts: Date.now() });
+                }
+            }
+        }
+
         delete m.incomeCard;
         delete m.incomeCash;
         delete m.balanceCard;
         delete m.balanceCash;
+        delete m.transferCard;
 
         m.categories.forEach(c => {
-            if (typeof c.spentCard !== 'number') c.spentCard = 0;
-            if (typeof c.spentCash !== 'number') c.spentCash = 0;
-            if (!Array.isArray(c.expenses)) c.expenses = [];
+            (c.expenses || []).forEach(e => {
+                if (!e.id) e.id = newId('e');
+                if (!e.sourceId) {
+                    const oldSrc = e.source === 'cash' ? 'cash' : 'card';
+                    const name = oldSrc === 'cash' ? 'Наличные' : 'Карта';
+                    let src = m.sources.find(s => s.type === oldSrc && s.name === name);
+                    if (!src) {
+                        src = { id: newId('s'), name: name, type: oldSrc };
+                        m.sources.push(src);
+                    }
+                    e.sourceId = src.id;
+                    delete e.source;
+                }
+            });
+            delete c.spentCard;
+            delete c.spentCash;
         });
     }
     Object.keys(state.months).forEach(k => migrateMonth(state.months[k]));
@@ -1031,53 +1121,59 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         return day + '.' + mon + ' ' + hh + ':' + mm;
     }
 
-    function catSpentCard(c) { return round2(c.spentCard || 0); }
-    function catSpentCash(c) { return round2(c.spentCash || 0); }
-    function catSpentTotal(c) { return round2(catSpentCard(c) + catSpentCash(c)); }
+    function catSpentTotal(c) {
+        return round2((c.expenses || []).reduce((s, e) => s + (e.amount || 0), 0));
+    }
 
-    // Считаем доходы по источникам
-    function incomeTotals(m) {
-        let card = 0, cash = 0;
-        (m.incomes || []).forEach(i => {
-            if (i.source === 'cash') cash = round2(cash + (i.amount || 0));
-            else card = round2(card + (i.amount || 0));
-        });
-        return { card, cash, total: round2(card + cash) };
+    function findSource(m, id) {
+        return (m.sources || []).find(s => s.id === id);
+    }
+    function sourceLabel(s) {
+        if (!s) return '—';
+        return s.name || (s.type === 'cash' ? 'Наличные' : 'Карта');
     }
 
     function monthTotals(key) {
         const m = state.months[key];
         if (!m) return {
-            income:0, incomeCard:0, incomeCash:0,
-            spent:0, spentCard:0, spentCash:0, planned:0,
-            balance:0, balanceCard:0, balanceCash:0,
-            transferCard:0
+            income: 0, spent: 0, planned: 0, balance: 0,
+            bySource: [], incomeBySource: {}, spentBySource: {}
         };
 
-        const inc = incomeTotals(m);
-        const incomeCard = inc.card;
-        const incomeCash = inc.cash;
-        const income = inc.total;
-
-        let spentCard = 0, spentCash = 0;
-        m.categories.forEach(c => {
-            spentCard = round2(spentCard + catSpentCard(c));
-            spentCash = round2(spentCash + catSpentCash(c));
+        const incomeBySource = {};
+        (m.incomes || []).forEach(i => {
+            incomeBySource[i.sourceId] = round2((incomeBySource[i.sourceId] || 0) + (i.amount || 0));
         });
-        const planned = round2(m.categories.reduce((s, c) => s + (c.plan || 0), 0));
-        const transferCard = round2(m.transferCard || 0);
 
-        const balanceCard = round2(incomeCard - spentCard - transferCard);
-        const balanceCash = round2(incomeCash - spentCash + transferCard);
-        const balance = round2(balanceCard + balanceCash);
-        const spent = round2(spentCard + spentCash);
+        const spentBySource = {};
+        (m.categories || []).forEach(c => {
+            (c.expenses || []).forEach(e => {
+                spentBySource[e.sourceId] = round2((spentBySource[e.sourceId] || 0) + (e.amount || 0));
+            });
+        });
 
-        return {
-            income, incomeCard, incomeCash,
-            spent, spentCard, spentCash, planned,
-            balance, balanceCard, balanceCash,
-            transferCard
-        };
+        const transIn = {};
+        const transOut = {};
+        (m.transfers || []).forEach(t => {
+            transOut[t.fromId] = round2((transOut[t.fromId] || 0) + (t.amount || 0));
+            transIn[t.toId] = round2((transIn[t.toId] || 0) + (t.amount || 0));
+        });
+
+        const bySource = (m.sources || []).map(s => {
+            const inc = incomeBySource[s.id] || 0;
+            const sp = spentBySource[s.id] || 0;
+            const tIn = transIn[s.id] || 0;
+            const tOut = transOut[s.id] || 0;
+            const balance = round2(inc - sp + tIn - tOut);
+            return { source: s, income: inc, spent: sp, transferIn: tIn, transferOut: tOut, balance };
+        });
+
+        const income = round2(bySource.reduce((s, x) => s + x.income, 0));
+        const spent = round2(bySource.reduce((s, x) => s + x.spent, 0));
+        const planned = round2((m.categories || []).reduce((s, c) => s + (c.plan || 0), 0));
+        const balance = round2(bySource.reduce((s, x) => s + x.balance, 0));
+
+        return { income, spent, planned, balance, bySource, incomeBySource, spentBySource };
     }
 
     function findGoal(id) { return state.goals.find(g => g.id === id); }
@@ -1109,6 +1205,40 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         }
     }
 
+    /* ====== НИК ПОЛЬЗОВАТЕЛЯ ====== */
+    function renderUserName() {
+        const el = document.getElementById('user-icon');
+        const valEl = document.getElementById('user-name-value');
+        const name = (state.userName || '').trim();
+        if (name) {
+            el.textContent = name;
+            valEl.textContent = name + ' ✎';
+        } else {
+            el.textContent = 'M';
+            valEl.textContent = 'не задано ✎';
+        }
+    }
+
+    document.getElementById('user-icon').addEventListener('click', openUsernameModal);
+    document.getElementById('user-name-value').addEventListener('click', openUsernameModal);
+
+    function openUsernameModal() {
+        document.getElementById('input-username').value = state.userName || '';
+        openModal('username-modal');
+        setTimeout(() => document.getElementById('input-username').focus(), 150);
+    }
+
+    document.getElementById('save-username').addEventListener('click', () => {
+        const name = document.getElementById('input-username').value.trim();
+        state.userName = name;
+        save();
+        closeModal('username-modal');
+        renderUserName();
+    });
+
+    /* ============================================================
+       ГЛАВНАЯ
+       ============================================================ */
     function renderMain() {
         const m = getMonth(THIS_MONTH);
         const t = monthTotals(THIS_MONTH);
@@ -1128,13 +1258,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             subEl.textContent = 'Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽';
         }
 
-        const balCardEl = document.getElementById('balance-card');
-        const balCashEl = document.getElementById('balance-cash');
-        balCardEl.textContent = fmt(t.balanceCard) + ' ₽';
-        balCashEl.textContent = fmt(t.balanceCash) + ' ₽';
-        balCardEl.classList.toggle('minus', t.balanceCard < 0);
-        balCashEl.classList.toggle('minus', t.balanceCash < 0);
-
+        renderBalanceSources('balance-sources', THIS_MONTH);
         renderMainGoalPreview();
         renderIncomeList();
 
@@ -1147,20 +1271,27 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 const plan = round2(cat.plan || 0);
                 const spent = catSpentTotal(cat);
                 const left = round2(plan - spent);
-                const cardS = catSpentCard(cat);
-                const cashS = catSpentCash(cat);
                 const count = (cat.expenses || []).length;
 
+                const bySrc = {};
+                (cat.expenses || []).forEach(e => {
+                    bySrc[e.sourceId] = round2((bySrc[e.sourceId] || 0) + (e.amount || 0));
+                });
                 let srcMini = '';
-                if (cardS > 0 || cashS > 0) {
-                    srcMini = '<div class="src-mini">' +
-                        (cardS > 0 ? '<span class="card">💳 ' + fmt(cardS) + ' ₽</span>' : '') +
-                        (cashS > 0 ? '<span class="cash">💵 ' + fmt(cashS) + ' ₽</span>' : '') +
-                    '</div>';
+                const srcKeys = Object.keys(bySrc);
+                if (srcKeys.length > 0) {
+                    srcMini = '<div class="src-mini">';
+                    srcKeys.forEach(sid => {
+                        const s = findSource(m, sid);
+                        const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
+                        srcMini += '<span><span class="src-dot ' + dotClass + '"></span>' +
+                            escapeHtml(sourceLabel(s)) + ' ' + fmt(bySrc[sid]) + ' ₽</span>';
+                    });
+                    srcMini += '</div>';
                 }
 
                 const historyBtn = count > 0
-                    ? '<button class="icon-btn list" data-action="open-log" data-id="' + cat.id + '" title="Расходы: посмотреть, изменить, удалить">📋</button>'
+                    ? '<button class="icon-btn list" data-action="open-log" data-id="' + cat.id + '" title="Расходы">📋</button>'
                     : '';
 
                 const div = document.createElement('div');
@@ -1200,12 +1331,47 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         });
     }
 
-    /* ====== РЕНДЕР СПИСКА ДОХОДОВ ====== */
+    function renderBalanceSources(targetId, monthKey) {
+        const m = getMonth(monthKey);
+        const box = document.getElementById(targetId);
+        if (!box) return;
+        box.innerHTML = '';
+
+        if (!m.sources || m.sources.length === 0) {
+            box.innerHTML = '<div class="empty-hint" style="grid-column:1/-1;">' +
+                'Пока нет источников.<br>Добавьте доход — и карта или наличные появятся здесь.</div>';
+            return;
+        }
+
+        const t = monthTotals(monthKey);
+        t.bySource.forEach(item => {
+            const s = item.source;
+            const dotClass = s.type === 'cash' ? 'cash' : 'card';
+            const el = document.createElement('div');
+            el.className = 'src';
+            el.dataset.transferSrc = s.id;
+            el.title = 'Нажмите, чтобы перевести деньги';
+            el.innerHTML =
+                '<span class="edit-badge">⇄</span>' +
+                '<span class="src-name"><span class="src-dot ' + dotClass + '"></span>' +
+                    escapeHtml(sourceLabel(s)) + '</span>' +
+                '<span class="src-value' + (item.balance < 0 ? ' minus' : '') + '">' +
+                    (item.balance < 0 ? '−' : '') + fmt(Math.abs(item.balance)) + ' ₽</span>';
+            box.appendChild(el);
+        });
+
+        box.querySelectorAll('[data-transfer-src]').forEach(el => {
+            el.addEventListener('click', function () {
+                openTransferModal(this.dataset.transferSrc);
+            });
+        });
+    }
+
     function renderIncomeList() {
         const m = getMonth(THIS_MONTH);
         const list = document.getElementById('income-list');
-        const inc = incomeTotals(m);
-        document.getElementById('income-total-badge').textContent = fmt(inc.total) + ' ₽';
+        const t = monthTotals(THIS_MONTH);
+        document.getElementById('income-total-badge').textContent = fmt(t.income) + ' ₽';
 
         list.innerHTML = '';
         if (!m.incomes || m.incomes.length === 0) {
@@ -1214,14 +1380,15 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         }
 
         m.incomes.forEach(income => {
+            const s = findSource(m, income.sourceId);
+            const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
             const div = document.createElement('div');
             div.className = 'income-item';
-            const srcLabel = income.source === 'cash' ? '💵 Наличными' : '💳 На карту';
-            const srcClass = income.source === 'cash' ? 'cash' : 'card';
             div.innerHTML =
                 '<div class="ii-info">' +
                     '<span class="ii-name">' + escapeHtml(income.name || 'Доход') + '</span>' +
-                    '<span class="ii-src"><span class="src-dot ' + srcClass + '"></span>' + srcLabel + '</span>' +
+                    '<span class="ii-src"><span class="src-dot ' + dotClass + '"></span>' +
+                        escapeHtml(sourceLabel(s)) + '</span>' +
                 '</div>' +
                 '<div class="ii-right">' +
                     '<span class="ii-amount">' + fmt(income.amount) + ' ₽</span>' +
@@ -1270,6 +1437,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             '</div>';
     }
 
+    /* ============================================================
+       СТАТИСТИКА
+       ============================================================ */
     function renderStat() {
         const m = getMonth(THIS_MONTH);
         const t = monthTotals(THIS_MONTH);
@@ -1339,12 +1509,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             subEl.textContent = 'Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽';
         }
 
-        const balCardEl = document.getElementById('stat-balance-card');
-        const balCashEl = document.getElementById('stat-balance-cash');
-        balCardEl.textContent = fmt(t.balanceCard) + ' ₽';
-        balCashEl.textContent = fmt(t.balanceCash) + ' ₽';
-        balCardEl.classList.toggle('minus', t.balanceCard < 0);
-        balCashEl.classList.toggle('minus', t.balanceCash < 0);
+        renderBalanceSources('stat-balance-sources', THIS_MONTH);
 
         const catBox = document.getElementById('stat-categories');
         catBox.innerHTML = '';
@@ -1356,15 +1521,22 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 const s = catSpentTotal(cat);
                 const p = plan > 0 ? Math.min(100, (s / plan) * 100) : (s > 0 ? 100 : 0);
                 const ov = plan > 0 && s > plan;
-                const cardS = catSpentCard(cat);
-                const cashS = catSpentCash(cat);
 
+                const bySrc = {};
+                (cat.expenses || []).forEach(e => {
+                    bySrc[e.sourceId] = round2((bySrc[e.sourceId] || 0) + (e.amount || 0));
+                });
                 let srcLine = '';
-                if (cardS > 0 || cashS > 0) {
-                    srcLine = '<div class="src-mini" style="justify-content:flex-start;">' +
-                        (cardS > 0 ? '<span class="card">💳 ' + fmt(cardS) + ' ₽</span>' : '') +
-                        (cashS > 0 ? '<span class="cash">💵 ' + fmt(cashS) + ' ₽</span>' : '') +
-                    '</div>';
+                const srcKeys = Object.keys(bySrc);
+                if (srcKeys.length > 0) {
+                    srcLine = '<div class="src-mini" style="justify-content:flex-start;">';
+                    srcKeys.forEach(sid => {
+                        const src = findSource(m, sid);
+                        const dotClass = (src && src.type === 'cash') ? 'cash' : 'card';
+                        srcLine += '<span><span class="src-dot ' + dotClass + '"></span>' +
+                            escapeHtml(sourceLabel(src)) + ' ' + fmt(bySrc[sid]) + ' ₽</span>';
+                    });
+                    srcLine += '</div>';
                 }
 
                 const div = document.createElement('div');
@@ -1381,14 +1553,31 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             });
         }
 
-        document.getElementById('stat-income-card').textContent = fmt(t.incomeCard) + ' ₽';
-        document.getElementById('stat-income-cash').textContent = fmt(t.incomeCash) + ' ₽';
-        document.getElementById('stat-income-total').textContent = fmt(t.income) + ' ₽';
-        document.getElementById('stat-spent-card').textContent = fmt(t.spentCard) + ' ₽';
-        document.getElementById('stat-spent-cash').textContent = fmt(t.spentCash) + ' ₽';
+        const rowsBox = document.getElementById('stat-income-rows');
+        rowsBox.innerHTML = '';
+        if ((m.sources || []).length === 0) {
+            rowsBox.innerHTML = '<div class="empty-hint">Нет источников</div>';
+        } else {
+            m.sources.forEach(s => {
+                const inc = t.incomeBySource[s.id] || 0;
+                const sp = t.spentBySource[s.id] || 0;
+                const dotClass = s.type === 'cash' ? 'cash' : 'card';
+                const row = document.createElement('div');
+                row.className = 'income-row';
+                row.innerHTML =
+                    '<span class="label"><span class="src-dot ' + dotClass + '"></span>' +
+                        escapeHtml(sourceLabel(s)) + '</span>' +
+                    '<span class="value">' + fmt(inc - sp) + ' ₽</span>';
+                rowsBox.appendChild(row);
+            });
+        }
+        document.getElementById('stat-income-total').textContent = fmt(t.income - t.spent) + ' ₽';
         document.getElementById('stat-spent-total').textContent = fmt(t.spent) + ' ₽';
     }
 
+    /* ============================================================
+       ЦЕЛИ
+       ============================================================ */
     function renderGoals() {
         const container = document.getElementById('goals-container');
         container.innerHTML = '';
@@ -1472,6 +1661,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); renderAll();
     }
 
+    /* ============================================================
+       АНАЛИТИКА
+       ============================================================ */
     function renderAnalytics() {
         const prevKey = prevMonthKey(THIS_MONTH);
         const cur = monthTotals(THIS_MONTH);
@@ -1579,19 +1771,19 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         html += '</div>';
 
-        // Доходы — по названиям
         html += '<div class="card" style="margin-bottom:12px;">' +
             '<div class="card-title">Доходы</div>';
         if (!m.incomes || m.incomes.length === 0) {
             html += '<div class="empty-hint">Доходов не было</div>';
         } else {
             m.incomes.forEach(i => {
-                const srcLabel = i.source === 'cash' ? '💵 Наличными' : '💳 На карту';
-                const srcClass = i.source === 'cash' ? 'cash' : 'card';
+                const s = findSource(m, i.sourceId);
+                const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
                 html += '<div class="income-item" style="border-bottom:1px solid var(--border);">' +
                     '<div class="ii-info">' +
                         '<span class="ii-name">' + escapeHtml(i.name || 'Доход') + '</span>' +
-                        '<span class="ii-src"><span class="src-dot ' + srcClass + '"></span>' + srcLabel + '</span>' +
+                        '<span class="ii-src"><span class="src-dot ' + dotClass + '"></span>' +
+                            escapeHtml(sourceLabel(s)) + '</span>' +
                     '</div>' +
                     '<div class="ii-right"><span class="ii-amount">' + fmt(i.amount) + ' ₽</span></div>' +
                 '</div>';
@@ -1603,35 +1795,34 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         '</div>';
 
         html += '<div class="card" style="margin-bottom:12px;">' +
-            '<div class="card-title">Расходы</div>' +
-            '<div class="income-row"><span class="label"><span class="src-dot card"></span>💳 С карты</span>' +
-                '<span class="value">' + fmt(t.spentCard) + ' ₽</span></div>' +
-            '<div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Наличными</span>' +
-                '<span class="value">' + fmt(t.spentCash) + ' ₽</span></div>' +
-            '<div class="income-row total"><span class="label">Всего расход</span>' +
-                '<span class="value">' + fmt(t.spent) + ' ₽</span></div>' +
-        '</div>';
-
-        if (Math.abs(t.transferCard) > 0.001) {
-            const dir = t.transferCard > 0
-                ? '💳 → 💵 С карты на наличные'
-                : '💵 → 💳 С наличных на карту';
-            html += '<div class="card" style="margin-bottom:12px;">' +
-                '<div class="card-title">Переводы</div>' +
-                '<div class="income-row"><span class="label">' + dir + '</span>' +
-                    '<span class="value">' + fmt(Math.abs(t.transferCard)) + ' ₽</span></div>' +
-            '</div>';
+            '<div class="card-title">Остатки по источникам</div>';
+        if (!m.sources || m.sources.length === 0) {
+            html += '<div class="empty-hint">Источников не было</div>';
+        } else {
+            t.bySource.forEach(item => {
+                const s = item.source;
+                const dotClass = s.type === 'cash' ? 'cash' : 'card';
+                html += '<div class="income-row"><span class="label"><span class="src-dot ' + dotClass + '"></span>' +
+                    escapeHtml(sourceLabel(s)) + '</span>' +
+                    '<span class="value"' + (item.balance < 0 ? ' style="color:var(--minus);"' : '') + '>' +
+                    (item.balance < 0 ? '−' : '') + fmt(Math.abs(item.balance)) + ' ₽</span></div>';
+            });
         }
+        html += '</div>';
 
-        html += '<div class="card" style="margin-bottom:12px;">' +
-            '<div class="card-title">Остаток на конец месяца</div>' +
-            '<div class="income-row"><span class="label"><span class="src-dot card"></span>💳 На карте</span>' +
-                '<span class="value"' + (t.balanceCard < 0 ? ' style="color:var(--minus);"' : '') + '>' +
-                    (t.balanceCard < 0 ? '−' : '') + fmt(Math.abs(t.balanceCard)) + ' ₽</span></div>' +
-            '<div class="income-row"><span class="label"><span class="src-dot cash"></span>💵 Наличные</span>' +
-                '<span class="value"' + (t.balanceCash < 0 ? ' style="color:var(--minus);"' : '') + '>' +
-                    (t.balanceCash < 0 ? '−' : '') + fmt(Math.abs(t.balanceCash)) + ' ₽</span></div>' +
-        '</div>';
+        if (m.transfers && m.transfers.length > 0) {
+            html += '<div class="card" style="margin-bottom:12px;">' +
+                '<div class="card-title">Переводы</div>';
+            m.transfers.forEach(tr => {
+                const fromS = findSource(m, tr.fromId);
+                const toS = findSource(m, tr.toId);
+                html += '<div class="income-row">' +
+                    '<span class="label">' + escapeHtml(sourceLabel(fromS)) + ' → ' + escapeHtml(sourceLabel(toS)) + '</span>' +
+                    '<span class="value">' + fmt(tr.amount) + ' ₽</span>' +
+                '</div>';
+            });
+            html += '</div>';
+        }
 
         html += '<div class="card" style="margin-bottom:12px;">' +
             '<div class="card-title">План / факт по категориям</div>';
@@ -1644,8 +1835,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 const spent = catSpentTotal(cat);
                 const left = round2(plan - spent);
                 const count = (cat.expenses || []).length;
-                const cardS = catSpentCard(cat);
-                const cashS = catSpentCash(cat);
 
                 html += '<div style="padding:10px 0;border-bottom:1px solid var(--border);">' +
                     '<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">' +
@@ -1665,23 +1854,17 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                         '</div>' +
                     '</div>';
 
-                if (cardS > 0 || cashS > 0) {
-                    html += '<div class="src-mini" style="justify-content:flex-start;margin-top:4px;">' +
-                        (cardS > 0 ? '<span class="card">💳 ' + fmt(cardS) + ' ₽</span>' : '') +
-                        (cashS > 0 ? '<span class="cash">💵 ' + fmt(cashS) + ' ₽</span>' : '') +
-                    '</div>';
-                }
-
                 if (count > 0) {
                     const sorted = [...cat.expenses].sort((a, b) => (b.ts || 0) - (a.ts || 0));
                     html += '<div style="margin-top:8px;padding:8px 10px;background:var(--soft);border-radius:10px;">';
                     sorted.forEach(e => {
+                        const s = findSource(m, e.sourceId);
+                        const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
                         html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:12px;">' +
                             '<span style="color:var(--text);font-weight:500;">' + fmt(e.amount) + ' ₽</span>' +
                             '<span style="color:var(--muted);display:flex;align-items:center;gap:6px;">' +
-                                '<span class="expense-log-src ' + (e.source === 'card' ? 'card' : 'cash') + '">' +
-                                    (e.source === 'card' ? '💳' : '💵') +
-                                '</span>' +
+                                '<span class="expense-log-src"><span class="src-dot ' + dotClass + '"></span>' +
+                                    escapeHtml(sourceLabel(s)) + '</span>' +
                                 '<span>' + (e.ts ? formatDateTime(e.ts) : '') + '</span>' +
                             '</span>' +
                         '</div>';
@@ -1720,23 +1903,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         }
         if (!confirm('Скопировать план (' + src.categories.length + ' пунктов) из ' +
                      monthLabel(sourceKey) + ' в текущий месяц?\n' +
-                     'Существующие пункты плана в текущем месяце будут заменены. ' +
-                     'Расходы текущего месяца останутся.')) return;
+                     'Существующие пункты плана в текущем месяце будут заменены.')) return;
 
         const dst = getMonth(THIS_MONTH);
-        const spentByCard = {};
-        const spentByCash = {};
-        dst.categories.forEach(c => {
-            spentByCard[c.name] = catSpentCard(c);
-            spentByCash[c.name] = catSpentCash(c);
-        });
-
         dst.categories = src.categories.map(c => ({
-            id: 'c' + Date.now() + Math.random().toString(36).slice(2, 6),
+            id: newId('c'),
             name: c.name,
             plan: round2(c.plan || 0),
-            spentCard: spentByCard[c.name] || 0,
-            spentCash: spentByCash[c.name] || 0,
             expenses: []
         }));
 
@@ -1754,18 +1927,25 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             alert('В этом месяце нет доходов для копирования');
             return;
         }
-        const incSrc = incomeTotals(src);
         if (!confirm('Скопировать доходы из ' + monthLabel(sourceKey) + ' в текущий месяц?\n' +
                      'Записей: ' + src.incomes.length + '\n' +
-                     'Всего: ' + fmt(incSrc.total) + ' ₽\n' +
-                     'Текущие доходы будут заменены.')) return;
+                     'Источники и названия сохранятся.')) return;
 
-        // Копируем записи как есть, с новыми id
+        const srcMap = {};
+        (src.sources || []).forEach(s => {
+            let existing = (dst.sources || []).find(x => x.name === s.name && x.type === s.type);
+            if (!existing) {
+                existing = { id: newId('s'), name: s.name, type: s.type };
+                dst.sources.push(existing);
+            }
+            srcMap[s.id] = existing.id;
+        });
+
         dst.incomes = src.incomes.map(i => ({
-            id: 'i' + Date.now() + Math.random().toString(36).slice(2, 6),
+            id: newId('i'),
             name: i.name || 'Доход',
             amount: round2(i.amount || 0),
-            source: i.source === 'cash' ? 'cash' : 'card'
+            sourceId: srcMap[i.sourceId] || i.sourceId
         }));
 
         save();
@@ -1775,18 +1955,92 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     }
 
     /* ============================================================
-       МОДАЛЬНОЕ ОКНО ДОХОДА (новая запись / редактирование)
+       ПИКЕР ИСТОЧНИКОВ
+       ============================================================ */
+    function renderSourcePicker(targetId, monthKey, activeId, onPick, withAddButton) {
+        const m = getMonth(monthKey);
+        const box = document.getElementById(targetId);
+        if (!box) return;
+        box.innerHTML = '';
+
+        if ((m.sources || []).length === 0) {
+            const hint = document.createElement('div');
+            hint.className = 'empty-hint';
+            hint.style.flex = '1 1 100%';
+            hint.textContent = 'Нет источников. Сначала добавьте доход.';
+            box.appendChild(hint);
+        } else {
+            m.sources.forEach(s => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.dataset.sourceId = s.id;
+                if (s.id === activeId) btn.classList.add('active');
+                const dotClass = s.type === 'cash' ? 'cash' : 'card';
+                btn.innerHTML = '<span class="src-dot ' + dotClass + '"></span>' +
+                    escapeHtml(sourceLabel(s));
+                btn.addEventListener('click', () => onPick(s.id));
+                box.appendChild(btn);
+            });
+        }
+
+        if (withAddButton) {
+            const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'add-src-btn';
+            addBtn.innerHTML = '+ Новый источник';
+            addBtn.addEventListener('click', () => openSourceModal(null, onPick));
+            box.appendChild(addBtn);
+        }
+    }
+
+    /* ============================================================
+       НОВЫЙ ИСТОЧНИК
+       ============================================================ */
+    let newSourceType = 'card';
+    let newSourceCallback = null;
+
+    function setNewSourceType(t) {
+        newSourceType = t;
+        document.getElementById('src-type-card').classList.toggle('active', t === 'card');
+        document.getElementById('src-type-cash').classList.toggle('active', t === 'cash');
+    }
+    document.getElementById('src-type-card').addEventListener('click', () => setNewSourceType('card'));
+    document.getElementById('src-type-cash').addEventListener('click', () => setNewSourceType('cash'));
+
+    function openSourceModal(preset, callback) {
+        newSourceCallback = callback || null;
+        document.getElementById('input-source-name').value = preset || '';
+        setNewSourceType('card');
+        openModal('source-modal');
+        setTimeout(() => document.getElementById('input-source-name').focus(), 150);
+    }
+
+    document.getElementById('save-source').addEventListener('click', () => {
+        const name = document.getElementById('input-source-name').value.trim();
+        if (!name) { alert('Введите название'); return; }
+        const m = getMonth(THIS_MONTH);
+        if (!m.sources) m.sources = [];
+        let existing = m.sources.find(s => s.name.toLowerCase() === name.toLowerCase());
+        if (existing) {
+            if (!confirm('Источник с таким названием уже есть. Использовать его?')) return;
+            closeModal('source-modal');
+            if (newSourceCallback) newSourceCallback(existing.id);
+            renderAll();
+            return;
+        }
+        const src = { id: newId('s'), name: name, type: newSourceType };
+        m.sources.push(src);
+        save();
+        closeModal('source-modal');
+        if (newSourceCallback) newSourceCallback(src.id);
+        renderAll();
+    });
+
+    /* ============================================================
+       ДОХОД
        ============================================================ */
     let editingIncomeId = null;
-    let incomeSourceDraft = 'card';
-
-    function setIncomeSource(src) {
-        incomeSourceDraft = src;
-        document.getElementById('inc-src-card').classList.toggle('active', src === 'card');
-        document.getElementById('inc-src-cash').classList.toggle('active', src === 'cash');
-    }
-    document.getElementById('inc-src-card').addEventListener('click', () => setIncomeSource('card'));
-    document.getElementById('inc-src-cash').addEventListener('click', () => setIncomeSource('cash'));
+    let incomeSourceIdDraft = null;
 
     function openIncomeModal(id) {
         editingIncomeId = id;
@@ -1801,15 +2055,26 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             titleEl.textContent = 'Изменить доход';
             nameInp.value = item.name || '';
             amountInp.value = item.amount ? String(item.amount).replace('.', ',') : '';
-            setIncomeSource(item.source === 'cash' ? 'cash' : 'card');
+            incomeSourceIdDraft = item.sourceId;
         } else {
             titleEl.textContent = 'Новый доход';
             nameInp.value = '';
             amountInp.value = '';
-            setIncomeSource('card');
+            incomeSourceIdDraft = (m.sources[0] && m.sources[0].id) || null;
         }
+        rebuildIncomeSourcePicker();
         openModal('income-modal');
         setTimeout(() => nameInp.focus(), 150);
+    }
+
+    function rebuildIncomeSourcePicker() {
+        renderSourcePicker(
+            'income-source-picker',
+            THIS_MONTH,
+            incomeSourceIdDraft,
+            (id) => { incomeSourceIdDraft = id; rebuildIncomeSourcePicker(); },
+            true
+        );
     }
 
     document.getElementById('add-income-btn').addEventListener('click', () => openIncomeModal(null));
@@ -1820,6 +2085,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         if (!name) { alert('Введите название дохода'); return; }
         if (!amount) { alert('Введите сумму'); return; }
+        if (!incomeSourceIdDraft) { alert('Выберите источник (или создайте новый)'); return; }
 
         const m = getMonth(THIS_MONTH);
         if (!m.incomes) m.incomes = [];
@@ -1829,14 +2095,14 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             if (item) {
                 item.name = name;
                 item.amount = amount;
-                item.source = incomeSourceDraft;
+                item.sourceId = incomeSourceIdDraft;
             }
         } else {
             m.incomes.push({
-                id: 'i' + Date.now() + Math.random().toString(36).slice(2, 6),
+                id: newId('i'),
                 name: name,
                 amount: amount,
-                source: incomeSourceDraft
+                sourceId: incomeSourceIdDraft
             });
         }
         save();
@@ -1855,73 +2121,304 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderAll();
     }
 
-    /* ====== Перевод ====== */
-    const inputTransfer = document.getElementById('input-transfer');
-    const transferModalTitle = document.getElementById('transfer-modal-title');
-    const transferModalHint = document.getElementById('transfer-modal-hint');
-    const tcCard = document.getElementById('tc-card');
-    const tcCash = document.getElementById('tc-cash');
+    /* ============================================================
+       РАСХОД
+       ============================================================ */
+    let expenseCatId = null;
+    let editingExpenseId = null;
+    let expenseSourceIdDraft = null;
 
-    let transferDir = 'card2cash';
-
-    function setTransferDir(dir) {
-        transferDir = dir;
-        document.getElementById('dir-card-to-cash').classList.toggle('active', dir === 'card2cash');
-        document.getElementById('dir-cash-to-card').classList.toggle('active', dir === 'cash2card');
-        const btn1 = document.getElementById('dir-card-to-cash');
-        const btn2 = document.getElementById('dir-cash-to-card');
-        const parent = btn1.parentNode;
-        if (dir === 'card2cash') parent.insertBefore(btn1, btn2);
-        else parent.insertBefore(btn2, btn1);
+    function openExpenseModal(catId) {
+        expenseCatId = catId;
+        editingExpenseId = null;
+        const m = getMonth(THIS_MONTH);
+        const cat = m.categories.find(c => c.id === catId);
+        if (!cat) return;
+        document.getElementById('expense-modal-title').textContent = 'Расход: ' + cat.name;
+        document.getElementById('input-expense').value = '';
+        document.getElementById('save-expense').textContent = 'Добавить';
+        expenseSourceIdDraft = (m.sources[0] && m.sources[0].id) || null;
+        rebuildExpenseSourcePicker();
+        openModal('expense-modal');
+        setTimeout(() => document.getElementById('input-expense').focus(), 150);
     }
 
-    document.getElementById('dir-card-to-cash').addEventListener('click', () => setTransferDir('card2cash'));
-    document.getElementById('dir-cash-to-card').addEventListener('click', () => setTransferDir('cash2card'));
+    function openEditExpenseModal(catId, expenseId) {
+        expenseCatId = catId;
+        editingExpenseId = expenseId;
+        const m = getMonth(THIS_MONTH);
+        const cat = m.categories.find(c => c.id === catId);
+        if (!cat) return;
+        const exp = (cat.expenses || []).find(e => e.id === expenseId);
+        if (!exp) return;
 
-    function openTransferModal(fromSrc) {
+        document.getElementById('expense-modal-title').textContent = 'Изменить расход: ' + cat.name;
+        document.getElementById('input-expense').value = String(exp.amount).replace('.', ',');
+        document.getElementById('save-expense').textContent = 'Сохранить';
+        expenseSourceIdDraft = exp.sourceId;
+        rebuildExpenseSourcePicker();
+        openModal('expense-modal');
+        setTimeout(() => document.getElementById('input-expense').focus(), 150);
+    }
+
+    // ВАЖНО: сюда передаём false — без кнопки «+ Новый источник»
+    function rebuildExpenseSourcePicker() {
+        renderSourcePicker(
+            'expense-source-picker',
+            THIS_MONTH,
+            expenseSourceIdDraft,
+            (id) => { expenseSourceIdDraft = id; rebuildExpenseSourcePicker(); updateExpenseHint(); },
+            false
+        );
+        updateExpenseHint();
+    }
+
+    function updateExpenseHint() {
+        const m = getMonth(THIS_MONTH);
         const t = monthTotals(THIS_MONTH);
-        tcCard.textContent = fmt(t.balanceCard) + ' ₽';
-        tcCash.textContent = fmt(t.balanceCash) + ' ₽';
-        tcCard.classList.toggle('minus', t.balanceCard < 0);
-        tcCash.classList.toggle('minus', t.balanceCash < 0);
-
-        if (fromSrc === 'card') {
-            transferModalTitle.textContent = 'Перевод: с карты на наличные';
-            transferModalHint.innerHTML =
-                'Сняли деньги с карты? Переведите сумму — она станет наличными. ' +
-                'Например, сняли <b>5000 ₽</b> с карты → на наличных станет больше на 5000 ₽.';
-            setTransferDir('card2cash');
+        const hint = document.getElementById('expense-balance-hint');
+        if (!hint) return;
+        if (!expenseSourceIdDraft) {
+            hint.innerHTML = 'Сначала добавьте доход, чтобы появились источники.';
+            return;
+        }
+        const item = t.bySource.find(x => x.source.id === expenseSourceIdDraft);
+        const avail = item ? item.balance : 0;
+        const s = findSource(m, expenseSourceIdDraft);
+        const nm = sourceLabel(s);
+        if (avail < 0) {
+            hint.innerHTML = 'На «' + escapeHtml(nm) + '» уже минус: <b style="color:var(--minus)">' +
+                fmt(Math.abs(avail)) + ' ₽</b>';
         } else {
-            transferModalTitle.textContent = 'Перевод: с наличных на карту';
-            transferModalHint.innerHTML =
-                'Внесли наличные на карту? Переведите сумму — она станет деньгами на карте. ' +
-                'Например, внесли <b>3000 ₽</b> на карту → на карте станет больше на 3000 ₽.';
-            setTransferDir('cash2card');
+            hint.innerHTML = 'Доступно на «' + escapeHtml(nm) + '»: <b>' + fmt(avail) + ' ₽</b>';
+        }
+    }
+
+    document.getElementById('save-expense').addEventListener('click', () => {
+        const amount = parseMoney(document.getElementById('input-expense').value);
+        if (!amount) { alert('Введите сумму'); return; }
+        if (!expenseSourceIdDraft) { alert('Выберите источник'); return; }
+        const cat = getMonth(THIS_MONTH).categories.find(c => c.id === expenseCatId);
+        if (!cat) { closeModal('expense-modal'); return; }
+
+        if (editingExpenseId) {
+            const exp = (cat.expenses || []).find(e => e.id === editingExpenseId);
+            if (exp) {
+                exp.amount = amount;
+                exp.sourceId = expenseSourceIdDraft;
+            }
+        } else {
+            if (!cat.expenses) cat.expenses = [];
+            cat.expenses.push({
+                id: newId('e'),
+                amount: amount,
+                sourceId: expenseSourceIdDraft,
+                ts: Date.now()
+            });
         }
 
-        inputTransfer.value = '';
-        openModal('transfer-modal');
-        setTimeout(() => inputTransfer.focus(), 150);
-    }
+        save();
+        closeModal('expense-modal');
+        expenseCatId = null;
+        editingExpenseId = null;
 
-    document.querySelectorAll('[data-transfer-src]').forEach(el => {
-        el.addEventListener('click', function () {
-            openTransferModal(this.dataset.transferSrc === 'cash' ? 'cash' : 'card');
-        });
+        if (logCatId) renderExpenseLog();
+        renderAll();
     });
 
-    document.getElementById('save-transfer').addEventListener('click', () => {
-        const amount = parseMoney(inputTransfer.value);
-        if (!amount) { alert('Введите сумму'); return; }
+    let logCatId = null;
+
+    function openExpenseLog(id) {
+        logCatId = id;
+        renderExpenseLog();
+        openModal('expense-list-modal');
+    }
+
+    function renderExpenseLog() {
         const m = getMonth(THIS_MONTH);
-        const delta = (transferDir === 'card2cash') ? amount : -amount;
-        m.transferCard = round2((m.transferCard || 0) + delta);
+        const cat = m.categories.find(c => c.id === logCatId);
+        if (!cat) return;
+
+        document.getElementById('expense-list-title').textContent = 'Расходы: ' + cat.name;
+
+        const list = cat.expenses || [];
+        const total = catSpentTotal(cat);
+
+        const summary = document.getElementById('expense-log-summary');
+        summary.innerHTML = '';
+        const bySrc = {};
+        list.forEach(e => {
+            bySrc[e.sourceId] = round2((bySrc[e.sourceId] || 0) + (e.amount || 0));
+        });
+        Object.keys(bySrc).forEach(sid => {
+            const s = findSource(m, sid);
+            const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
+            const div = document.createElement('div');
+            div.className = 's';
+            div.innerHTML = '<span class="l"><span class="src-dot ' + dotClass + '"></span>' +
+                escapeHtml(sourceLabel(s)) + '</span>' +
+                '<span class="v">' + fmt(bySrc[sid]) + ' ₽</span>';
+            summary.appendChild(div);
+        });
+        const totDiv = document.createElement('div');
+        totDiv.className = 's';
+        totDiv.innerHTML = '<span class="l">Всего</span><span class="v">' + fmt(total) + ' ₽</span>';
+        summary.appendChild(totDiv);
+
+        const box = document.getElementById('expense-log-list');
+        box.innerHTML = '';
+
+        const clearBtn = document.getElementById('clear-category-expenses');
+
+        if (list.length === 0) {
+            box.innerHTML = '<div class="empty-hint">В этой категории пока нет расходов</div>';
+            clearBtn.style.display = 'none';
+            return;
+        }
+        clearBtn.style.display = 'block';
+
+        const sorted = [...list].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+        sorted.forEach(e => {
+            const s = findSource(m, e.sourceId);
+            const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
+            const div = document.createElement('div');
+            div.className = 'expense-log-item';
+            div.innerHTML =
+                '<div class="expense-log-left">' +
+                    '<span class="expense-log-amount">' + fmt(e.amount) + ' ₽</span>' +
+                    '<span class="expense-log-meta">' +
+                        '<span class="expense-log-src"><span class="src-dot ' + dotClass + '"></span>' +
+                            escapeHtml(sourceLabel(s)) + '</span>' +
+                        '<span>' + (e.ts ? formatDateTime(e.ts) : '') + '</span>' +
+                    '</span>' +
+                '</div>' +
+                '<div class="expense-log-actions">' +
+                    '<button class="expense-edit-btn" data-edit-id="' + e.id + '" title="Изменить расход">✎</button>' +
+                    '<button class="expense-delete-btn" data-expense-id="' + e.id + '" title="Удалить этот расход">🗑</button>' +
+                '</div>';
+            box.appendChild(div);
+        });
+
+        box.querySelectorAll('button[data-edit-id]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const eid = this.dataset.editId;
+                closeModal('expense-list-modal');
+                openEditExpenseModal(logCatId, eid);
+            });
+        });
+
+        box.querySelectorAll('button[data-expense-id]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const eid = this.dataset.expenseId;
+                if (!confirm('Удалить этот расход?')) return;
+                const cat2 = getMonth(THIS_MONTH).categories.find(c => c.id === logCatId);
+                if (!cat2) return;
+                cat2.expenses = (cat2.expenses || []).filter(x => x.id !== eid);
+                save();
+                renderExpenseLog();
+                renderAll();
+            });
+        });
+    }
+
+    document.getElementById('clear-category-expenses').addEventListener('click', () => {
+        if (!logCatId) return;
+        const cat = getMonth(THIS_MONTH).categories.find(c => c.id === logCatId);
+        if (!cat) return;
+        if (!confirm('Стереть ВСЕ расходы в категории «' + cat.name + '»?')) return;
+        cat.expenses = [];
+        save();
+        renderExpenseLog();
+        renderAll();
+    });
+
+    /* ============================================================
+       ПЕРЕВОДЫ
+       ============================================================ */
+    let transferFromId = null;
+    let transferToId = null;
+
+    function openTransferModal(preselectFromId) {
+        const m = getMonth(THIS_MONTH);
+        const t = monthTotals(THIS_MONTH);
+
+        if (!m.sources || m.sources.length < 2) {
+            alert('Нужно минимум два источника (например две карты или карта и наличные).\nДобавьте доход — источники появятся автоматически.');
+            return;
+        }
+
+        const cur = document.getElementById('transfer-current');
+        cur.innerHTML = '';
+        t.bySource.forEach(item => {
+            const s = item.source;
+            const dotClass = s.type === 'cash' ? 'cash' : 'card';
+            const div = document.createElement('div');
+            div.className = 'tc';
+            div.innerHTML = '<span class="tc-label"><span class="src-dot ' + dotClass + '"></span>' +
+                escapeHtml(sourceLabel(s)) + '</span>' +
+                '<span class="tc-value">' + (item.balance < 0 ? '−' : '') + fmt(Math.abs(item.balance)) + ' ₽</span>';
+            cur.appendChild(div);
+        });
+
+        transferFromId = preselectFromId || m.sources[0].id;
+        transferToId = m.sources.find(s => s.id !== transferFromId).id;
+
+        document.getElementById('input-transfer').value = '';
+        document.getElementById('transfer-modal-title').textContent = 'Перевод между источниками';
+        document.getElementById('transfer-modal-hint').innerHTML =
+            'Перекиньте деньги между картами и наличными. Например, сняли с карты — стали наличными.';
+
+        rebuildTransferPickers();
+
+        openModal('transfer-modal');
+        setTimeout(() => document.getElementById('input-transfer').focus(), 150);
+    }
+
+    function rebuildTransferPickers() {
+        renderSourcePicker('transfer-from-picker', THIS_MONTH, transferFromId,
+            (id) => {
+                transferFromId = id;
+                if (transferToId === id) {
+                    const other = getMonth(THIS_MONTH).sources.find(s => s.id !== id);
+                    transferToId = other ? other.id : null;
+                }
+                rebuildTransferPickers();
+            }, false);
+
+        renderSourcePicker('transfer-to-picker', THIS_MONTH, transferToId,
+            (id) => {
+                transferToId = id;
+                if (transferFromId === id) {
+                    const other = getMonth(THIS_MONTH).sources.find(s => s.id !== id);
+                    transferFromId = other ? other.id : null;
+                }
+                rebuildTransferPickers();
+            }, false);
+    }
+
+    document.getElementById('save-transfer').addEventListener('click', () => {
+        const amount = parseMoney(document.getElementById('input-transfer').value);
+        if (!amount) { alert('Введите сумму'); return; }
+        if (!transferFromId || !transferToId) { alert('Выберите источники'); return; }
+        if (transferFromId === transferToId) { alert('Источники должны различаться'); return; }
+        const m = getMonth(THIS_MONTH);
+        if (!m.transfers) m.transfers = [];
+        m.transfers.push({
+            id: newId('t'),
+            fromId: transferFromId,
+            toId: transferToId,
+            amount: amount,
+            ts: Date.now()
+        });
         save();
         closeModal('transfer-modal');
         renderAll();
     });
 
-    /* ====== Категории ====== */
+    /* ============================================================
+       КАТЕГОРИИ
+       ============================================================ */
     let editingCatId = null;
     document.getElementById('add-category-btn').addEventListener('click', () => openCategoryModal(null));
 
@@ -1957,212 +2454,18 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             if (cat) { cat.name = name; cat.plan = plan; }
         } else {
             m.categories.push({
-                id: 'c' + Date.now() + Math.random().toString(36).slice(2, 6),
-                name: name, plan: plan,
-                spentCard: 0, spentCash: 0, expenses: []
+                id: newId('c'),
+                name: name,
+                plan: plan,
+                expenses: []
             });
         }
         save(); closeModal('category-modal'); editingCatId = null; renderAll();
     });
 
-    /* ====== Расходы ====== */
-    let expenseCatId = null;
-    let editingExpenseId = null;
-    let expenseSource = 'card';
-
-    function setExpenseSource(src) {
-        expenseSource = src;
-        document.getElementById('src-card').classList.toggle('active', src === 'card');
-        document.getElementById('src-cash').classList.toggle('active', src === 'cash');
-        updateExpenseHint();
-    }
-    document.getElementById('src-card').addEventListener('click', () => setExpenseSource('card'));
-    document.getElementById('src-cash').addEventListener('click', () => setExpenseSource('cash'));
-
-    function updateExpenseHint() {
-        const t = monthTotals(THIS_MONTH);
-        const hint = document.getElementById('expense-balance-hint');
-        if (!hint) return;
-        const avail = expenseSource === 'card' ? t.balanceCard : t.balanceCash;
-        const srcName = expenseSource === 'card' ? 'карте' : 'наличке';
-        if (avail < 0) {
-            hint.innerHTML = 'На ' + srcName + ' уже минус: <b style="color:var(--minus)">' +
-                fmt(Math.abs(avail)) + ' ₽</b>';
-        } else {
-            hint.innerHTML = 'Доступно на ' + srcName + ': <b>' + fmt(avail) + ' ₽</b>';
-        }
-    }
-
-    function openExpenseModal(catId) {
-        expenseCatId = catId;
-        editingExpenseId = null;
-        const cat = getMonth(THIS_MONTH).categories.find(c => c.id === catId);
-        if (!cat) return;
-        document.getElementById('expense-modal-title').textContent = 'Расход: ' + cat.name;
-        document.getElementById('input-expense').value = '';
-        document.getElementById('save-expense').textContent = 'Добавить';
-        setExpenseSource('card');
-        openModal('expense-modal');
-        setTimeout(() => document.getElementById('input-expense').focus(), 150);
-    }
-
-    function openEditExpenseModal(catId, expenseId) {
-        expenseCatId = catId;
-        editingExpenseId = expenseId;
-        const cat = getMonth(THIS_MONTH).categories.find(c => c.id === catId);
-        if (!cat) return;
-        const exp = (cat.expenses || []).find(e => e.id === expenseId);
-        if (!exp) return;
-
-        document.getElementById('expense-modal-title').textContent = 'Изменить расход: ' + cat.name;
-        document.getElementById('input-expense').value = String(exp.amount).replace('.', ',');
-        document.getElementById('save-expense').textContent = 'Сохранить';
-        setExpenseSource(exp.source === 'cash' ? 'cash' : 'card');
-        openModal('expense-modal');
-        setTimeout(() => document.getElementById('input-expense').focus(), 150);
-    }
-
-    document.getElementById('save-expense').addEventListener('click', () => {
-        const amount = parseMoney(document.getElementById('input-expense').value);
-        if (!amount) { alert('Введите сумму'); return; }
-        const cat = getMonth(THIS_MONTH).categories.find(c => c.id === expenseCatId);
-        if (!cat) { closeModal('expense-modal'); return; }
-
-        if (editingExpenseId) {
-            const exp = (cat.expenses || []).find(e => e.id === editingExpenseId);
-            if (exp) {
-                exp.amount = amount;
-                exp.source = expenseSource;
-            }
-            recalcCategoryFromExpenses(cat);
-        } else {
-            if (!cat.expenses) cat.expenses = [];
-            cat.expenses.push({
-                id: 'e' + Date.now() + Math.random().toString(36).slice(2, 6),
-                amount: amount,
-                source: expenseSource,
-                ts: Date.now()
-            });
-            if (expenseSource === 'card') {
-                cat.spentCard = round2((cat.spentCard || 0) + amount);
-            } else {
-                cat.spentCash = round2((cat.spentCash || 0) + amount);
-            }
-        }
-
-        save();
-        closeModal('expense-modal');
-        expenseCatId = null;
-        editingExpenseId = null;
-
-        if (logCatId) renderExpenseLog();
-        renderAll();
-    });
-
-    let logCatId = null;
-
-    function recalcCategoryFromExpenses(cat) {
-        let card = 0, cash = 0;
-        (cat.expenses || []).forEach(e => {
-            if (e.source === 'card') card = round2(card + e.amount);
-            else cash = round2(cash + e.amount);
-        });
-        cat.spentCard = card;
-        cat.spentCash = cash;
-    }
-
-    function openExpenseLog(id) {
-        logCatId = id;
-        renderExpenseLog();
-        openModal('expense-list-modal');
-    }
-
-    function renderExpenseLog() {
-        const cat = getMonth(THIS_MONTH).categories.find(c => c.id === logCatId);
-        if (!cat) return;
-
-        document.getElementById('expense-list-title').textContent = 'Расходы: ' + cat.name;
-
-        const list = cat.expenses || [];
-        const card = catSpentCard(cat);
-        const cash = catSpentCash(cat);
-        const total = catSpentTotal(cat);
-
-        document.getElementById('log-sum-card').textContent = fmt(card) + ' ₽';
-        document.getElementById('log-sum-cash').textContent = fmt(cash) + ' ₽';
-        document.getElementById('log-sum-total').textContent = fmt(total) + ' ₽';
-
-        const box = document.getElementById('expense-log-list');
-        box.innerHTML = '';
-
-        const clearBtn = document.getElementById('clear-category-expenses');
-
-        if (list.length === 0) {
-            box.innerHTML = '<div class="empty-hint">В этой категории пока нет расходов</div>';
-            clearBtn.style.display = 'none';
-            return;
-        }
-        clearBtn.style.display = 'block';
-
-        const sorted = [...list].sort((a, b) => (b.ts || 0) - (a.ts || 0));
-
-        sorted.forEach(e => {
-            const div = document.createElement('div');
-            div.className = 'expense-log-item';
-            div.innerHTML =
-                '<div class="expense-log-left">' +
-                    '<span class="expense-log-amount">' + fmt(e.amount) + ' ₽</span>' +
-                    '<span class="expense-log-meta">' +
-                        '<span class="expense-log-src ' + (e.source === 'card' ? 'card' : 'cash') + '">' +
-                            (e.source === 'card' ? '💳 С карты' : '💵 С налички') +
-                        '</span>' +
-                        '<span>' + (e.ts ? formatDateTime(e.ts) : '') + '</span>' +
-                    '</span>' +
-                '</div>' +
-                '<div class="expense-log-actions">' +
-                    '<button class="expense-edit-btn" data-edit-id="' + e.id + '" title="Изменить расход">✎</button>' +
-                    '<button class="expense-delete-btn" data-expense-id="' + e.id + '" title="Удалить этот расход">🗑</button>' +
-                '</div>';
-            box.appendChild(div);
-        });
-
-        box.querySelectorAll('button[data-edit-id]').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const eid = this.dataset.editId;
-                closeModal('expense-list-modal');
-                openEditExpenseModal(logCatId, eid);
-            });
-        });
-
-        box.querySelectorAll('button[data-expense-id]').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const eid = this.dataset.expenseId;
-                if (!confirm('Удалить этот расход?')) return;
-                const cat2 = getMonth(THIS_MONTH).categories.find(c => c.id === logCatId);
-                if (!cat2) return;
-                cat2.expenses = (cat2.expenses || []).filter(x => x.id !== eid);
-                recalcCategoryFromExpenses(cat2);
-                save();
-                renderExpenseLog();
-                renderAll();
-            });
-        });
-    }
-
-    document.getElementById('clear-category-expenses').addEventListener('click', () => {
-        if (!logCatId) return;
-        const cat = getMonth(THIS_MONTH).categories.find(c => c.id === logCatId);
-        if (!cat) return;
-        if (!confirm('Стереть ВСЕ расходы в категории «' + cat.name + '»?')) return;
-        cat.expenses = [];
-        cat.spentCard = 0;
-        cat.spentCash = 0;
-        save();
-        renderExpenseLog();
-        renderAll();
-    });
-
-    /* ====== Цели ====== */
+    /* ============================================================
+       ЦЕЛИ
+       ============================================================ */
     let editingGoalId = null;
     document.getElementById('add-goal-btn').addEventListener('click', () => openGoalModal(null));
     document.getElementById('info-goals-btn').addEventListener('click', () => {
@@ -2208,7 +2511,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         } else {
             const isFirst = state.goals.filter(g => !g.archived).length === 0;
             state.goals.push({
-                id: 'g' + Date.now() + Math.random().toString(36).slice(2, 6),
+                id: newId('g'),
                 name: name, target: target, current: current,
                 primary: isFirst, archived: false, monthlyHistory: []
             });
@@ -2244,7 +2547,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         closeModal('goal-add-modal'); addingToGoalId = null; renderAll();
     });
 
-    /* ====== Общие модалки ====== */
+    /* ============================================================
+       ОБЩИЕ МОДАЛКИ
+       ============================================================ */
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
@@ -2292,12 +2597,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     });
 
     document.getElementById('reset-month').addEventListener('click', () => {
-        if (!confirm('Обнулить все расходы текущего месяца? Планы и доходы сохранятся.')) return;
+        if (!confirm('Обнулить все расходы и переводы текущего месяца? Планы и доходы сохранятся.')) return;
         const m = getMonth(THIS_MONTH);
-        m.categories.forEach(c => {
-            c.spentCard = 0; c.spentCash = 0; c.expenses = [];
-        });
-        m.transferCard = 0;
+        m.categories.forEach(c => { c.expenses = []; });
+        m.transfers = [];
         save(); renderAll();
     });
 
@@ -2305,6 +2608,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         if (!confirm('Удалить ВСЕ данные: категории, доходы, цели и историю? Это нельзя отменить.')) return;
         state.months = {}; state.months[THIS_MONTH] = emptyMonth();
         state.goals = []; state.lastClosedMonth = null;
+        state.userName = '';
         save(); renderAll();
     });
 
@@ -2319,7 +2623,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 String(d.getMonth() + 1).padStart(2, '0') + '-' +
                 String(d.getDate()).padStart(2, '0');
             a.href = url;
-            a.download = 'money_tochka_backup_' + stamp + '.json';
+            a.download = 'maney_backup_' + stamp + '.json';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -2341,16 +2645,18 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             try {
                 const parsed = JSON.parse(e.target.result);
                 if (!parsed || typeof parsed !== 'object' || !parsed.months) {
-                    alert('Это не похоже на файл резервной копии Мани.точки.');
+                    alert('Это не похоже на файл резервной копии.');
                     return;
                 }
                 if (!confirm('Импортировать данные из файла?\nВсе текущие данные будут заменены.')) return;
 
                 state = Object.assign({
+                    userName: '',
                     accent: 'pink', mode: 'light', months: {}, goals: [], lastClosedMonth: null
                 }, parsed);
                 if (!state.goals) state.goals = [];
                 if (!state.months) state.months = {};
+                if (typeof state.userName !== 'string') state.userName = '';
                 const THIS_MONTH_NOW = currentMonthKey();
                 if (!state.months[THIS_MONTH_NOW]) state.months[THIS_MONTH_NOW] = emptyMonth();
                 Object.keys(state.months).forEach(k => migrateMonth(state.months[k]));
@@ -2367,6 +2673,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     });
 
     function renderAll() {
+        renderUserName();
         renderMain();
         renderStat();
         renderGoals();
