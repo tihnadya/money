@@ -106,17 +106,6 @@ body { background: var(--body-bg); }
 .src-dot.card { background: #6c9bff !important; }
 .src-dot.cash { background: #3bc9a3 !important; }
 
-.src-label-row {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: var(--muted);
-    height: 16px;
-    line-height: 16px;
-    min-height: 16px;
-}
-
 .balance-sources {
     display:grid;
     grid-template-columns: 1fr 1fr;
@@ -163,27 +152,91 @@ body { background: var(--body-bg); }
 .plan-progress-fill { height:100%; background:var(--primary); border-radius:10px; transition:width .4s; }
 .plan-progress-fill.over { background:var(--minus); }
 
+/* ====== КАРТОЧКА КАТЕГОРИИ ====== */
 .category-item {
-    display:flex; justify-content:space-between; align-items:center;
-    padding:10px 0; border-bottom:1px solid var(--border); gap:8px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
-.category-item:last-child { border-bottom:none; }
-.category-info { display:flex; flex-direction:column; gap:2px; min-width:0; flex:1; }
-.category-name { font-weight:600; color:var(--text); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.category-plan { font-size:12px; color:var(--muted); }
-.category-right { display:flex; align-items:center; gap:6px; flex-shrink:0; }
-.category-stats { text-align:right; }
-.category-stats .amount { font-weight:600; color:var(--text); font-size:14px; }
-.category-stats .left { font-size:12px; color:var(--muted); }
-.category-stats .left.negative { color:var(--minus); }
+.category-item:last-child { border-bottom: none; }
 
-.src-mini { display:flex; gap:5px; justify-content:flex-end; margin-top:3px; flex-wrap:wrap; align-items:center; }
-.src-mini span {
-    font-size:10px; padding:1px 6px; border-radius:10px; font-weight:600;
-    background:var(--soft); color:var(--muted); white-space:nowrap;
-    display:inline-flex; align-items:center; gap:4px;
+.category-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
 }
-.src-mini span .src-dot { width:6px !important; height:6px !important; min-width:6px !important; min-height:6px !important; max-width:6px !important; max-height:6px !important; }
+.category-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+}
+.category-name {
+    font-weight: 600;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 15px;
+}
+.category-plan {
+    font-size: 12px;
+    color: var(--muted);
+}
+.category-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.category-amounts {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+}
+.category-amounts .amount {
+    font-weight: 700;
+    color: var(--text);
+    font-size: 16px;
+}
+.category-amounts .left {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: right;
+}
+.category-amounts .left.negative { color: var(--minus); }
+
+.src-mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 10px;
+    margin-top: 2px;
+}
+.src-mini .src-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--muted);
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.src-mini .src-chip .src-chip-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.src-mini .src-chip .src-chip-amount {
+    color: var(--text);
+    font-weight: 600;
+    flex-shrink: 0;
+}
 
 .icon-btn {
     background:var(--soft); border:none; width:30px; height:30px; border-radius:50%;
@@ -264,11 +317,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .settings-row:last-child { border-bottom:none; }
 .settings-row .label { color:var(--text); font-weight:450; }
 .settings-row .value { color:var(--muted); text-align:right; }
-.settings-row .value.editable {
-    cursor:pointer;
-    color:var(--primary);
-    font-weight:600;
-}
+.settings-row .value.editable { cursor:pointer; color:var(--primary); font-weight:600; }
 
 .history-row {
     display:flex; justify-content:space-between; align-items:center;
@@ -276,10 +325,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     gap:10px; cursor:pointer; transition:.15s;
 }
 .history-row:last-child { border-bottom:none; }
-.history-row:hover {
-    background:var(--soft);
-    margin:0 -18px; padding-left:18px; padding-right:18px;
-}
+.history-row:hover { background:var(--soft); margin:0 -18px; padding-left:18px; padding-right:18px; }
 .history-row.current { background:var(--income-total-bg); margin:0 -18px; padding-left:18px; padding-right:18px; border-radius:12px; }
 .history-row .h-name { color:var(--text); font-weight:500; flex:1; }
 .history-row .h-balance { color:var(--text); font-weight:600; }
@@ -316,9 +362,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .field input::placeholder { color:var(--muted); opacity:.6; }
 .field .hint { font-size:11px; color:var(--muted); margin-top:4px; padding-left:4px; opacity:.8; }
 
-.source-picker-dynamic {
-    display:flex; flex-wrap:wrap; gap:8px;
-}
+.source-picker-dynamic { display:flex; flex-wrap:wrap; gap:8px; }
 .source-picker-dynamic button {
     flex:1 1 calc(50% - 4px);
     min-width:0;
@@ -694,7 +738,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
 <!-- ====== МОДАЛЬНЫЕ ОКНА ====== -->
 
-<!-- Доход -->
 <div class="modal-overlay" id="income-modal">
     <div class="modal">
         <h3 id="income-modal-title">Новый доход</h3>
@@ -719,7 +762,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
-<!-- Новый источник -->
 <div class="modal-overlay" id="source-modal">
     <div class="modal">
         <h3 id="source-modal-title">Новый источник</h3>
@@ -744,7 +786,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
-<!-- Перевод -->
 <div class="modal-overlay" id="transfer-modal">
     <div class="modal">
         <h3 id="transfer-modal-title">Перевод</h3>
@@ -795,7 +836,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
-<!-- Расход -->
 <div class="modal-overlay" id="expense-modal">
     <div class="modal">
         <h3 id="expense-modal-title">Добавить расход</h3>
@@ -882,7 +922,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
-<!-- Изменение имени пользователя -->
 <div class="modal-overlay" id="username-modal">
     <div class="modal">
         <h3>Ваше имя</h3>
@@ -1205,7 +1244,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         }
     }
 
-    /* ====== НИК ПОЛЬЗОВАТЕЛЯ ====== */
     function renderUserName() {
         const el = document.getElementById('user-icon');
         const valEl = document.getElementById('user-name-value');
@@ -1236,9 +1274,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderUserName();
     });
 
-    /* ============================================================
-       ГЛАВНАЯ
-       ============================================================ */
     function renderMain() {
         const m = getMonth(THIS_MONTH);
         const t = monthTotals(THIS_MONTH);
@@ -1284,8 +1319,11 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                     srcKeys.forEach(sid => {
                         const s = findSource(m, sid);
                         const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
-                        srcMini += '<span><span class="src-dot ' + dotClass + '"></span>' +
-                            escapeHtml(sourceLabel(s)) + ' ' + fmt(bySrc[sid]) + ' ₽</span>';
+                        srcMini += '<span class="src-chip">' +
+                            '<span class="src-dot ' + dotClass + '"></span>' +
+                            '<span class="src-chip-name">' + escapeHtml(sourceLabel(s)) + '</span>' +
+                            '<span class="src-chip-amount">' + fmt(bySrc[sid]) + ' ₽</span>' +
+                        '</span>';
                     });
                     srcMini += '</div>';
                 }
@@ -1297,24 +1335,26 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 const div = document.createElement('div');
                 div.className = 'category-item';
                 div.innerHTML =
-                    '<div class="category-info">' +
-                        '<span class="category-name">' + escapeHtml(cat.name) +
-                            (count > 0 ? ' <span style="font-weight:400;font-size:11px;color:var(--muted);">(' + count + ')</span>' : '') +
-                        '</span>' +
-                        '<span class="category-plan">План ' + fmt(plan) + ' ₽</span>' +
-                    '</div>' +
-                    '<div class="category-right">' +
-                        '<div class="category-stats">' +
-                            '<div class="amount">' + fmt(spent) + ' ₽</div>' +
-                            '<div class="left' + (left < 0 ? ' negative' : '') + '">' +
-                                (left < 0 ? 'Перерасход ' + fmt(Math.abs(left)) : 'Осталось ' + fmt(left)) + ' ₽' +
-                            '</div>' +
-                            srcMini +
+                    '<div class="category-head">' +
+                        '<div class="category-info">' +
+                            '<span class="category-name">' + escapeHtml(cat.name) +
+                                (count > 0 ? ' <span style="font-weight:400;font-size:11px;color:var(--muted);">(' + count + ')</span>' : '') +
+                            '</span>' +
+                            '<span class="category-plan">План ' + fmt(plan) + ' ₽</span>' +
                         '</div>' +
-                        historyBtn +
-                        '<button class="icon-btn plus" data-action="expense" data-id="' + cat.id + '" title="Добавить расход">+</button>' +
-                        '<button class="icon-btn" data-action="edit-cat" data-id="' + cat.id + '" title="Редактировать пункт">✎</button>' +
-                    '</div>';
+                        '<div class="category-actions">' +
+                            historyBtn +
+                            '<button class="icon-btn plus" data-action="expense" data-id="' + cat.id + '" title="Добавить расход">+</button>' +
+                            '<button class="icon-btn" data-action="edit-cat" data-id="' + cat.id + '" title="Редактировать пункт">✎</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="category-amounts">' +
+                        '<span class="amount">' + fmt(spent) + ' ₽</span>' +
+                        '<span class="left' + (left < 0 ? ' negative' : '') + '">' +
+                            (left < 0 ? 'Перерасход ' + fmt(Math.abs(left)) : 'Осталось ' + fmt(left)) + ' ₽' +
+                        '</span>' +
+                    '</div>' +
+                    srcMini;
                 list.appendChild(div);
             });
         }
@@ -1437,9 +1477,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             '</div>';
     }
 
-    /* ============================================================
-       СТАТИСТИКА
-       ============================================================ */
     function renderStat() {
         const m = getMonth(THIS_MONTH);
         const t = monthTotals(THIS_MONTH);
@@ -1529,12 +1566,15 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 let srcLine = '';
                 const srcKeys = Object.keys(bySrc);
                 if (srcKeys.length > 0) {
-                    srcLine = '<div class="src-mini" style="justify-content:flex-start;">';
+                    srcLine = '<div class="src-mini">';
                     srcKeys.forEach(sid => {
                         const src = findSource(m, sid);
                         const dotClass = (src && src.type === 'cash') ? 'cash' : 'card';
-                        srcLine += '<span><span class="src-dot ' + dotClass + '"></span>' +
-                            escapeHtml(sourceLabel(src)) + ' ' + fmt(bySrc[sid]) + ' ₽</span>';
+                        srcLine += '<span class="src-chip">' +
+                            '<span class="src-dot ' + dotClass + '"></span>' +
+                            '<span class="src-chip-name">' + escapeHtml(sourceLabel(src)) + '</span>' +
+                            '<span class="src-chip-amount">' + fmt(bySrc[sid]) + ' ₽</span>' +
+                        '</span>';
                     });
                     srcLine += '</div>';
                 }
@@ -1575,9 +1615,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         document.getElementById('stat-spent-total').textContent = fmt(t.spent) + ' ₽';
     }
 
-    /* ============================================================
-       ЦЕЛИ
-       ============================================================ */
     function renderGoals() {
         const container = document.getElementById('goals-container');
         container.innerHTML = '';
@@ -1661,9 +1698,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); renderAll();
     }
 
-    /* ============================================================
-       АНАЛИТИКА
-       ============================================================ */
     function renderAnalytics() {
         const prevKey = prevMonthKey(THIS_MONTH);
         const cur = monthTotals(THIS_MONTH);
@@ -1954,9 +1988,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         alert('Доходы скопированы в ' + monthLabel(THIS_MONTH));
     }
 
-    /* ============================================================
-       ПИКЕР ИСТОЧНИКОВ
-       ============================================================ */
     function renderSourcePicker(targetId, monthKey, activeId, onPick, withAddButton) {
         const m = getMonth(monthKey);
         const box = document.getElementById(targetId);
@@ -1993,9 +2024,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         }
     }
 
-    /* ============================================================
-       НОВЫЙ ИСТОЧНИК
-       ============================================================ */
     let newSourceType = 'card';
     let newSourceCallback = null;
 
@@ -2036,9 +2064,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderAll();
     });
 
-    /* ============================================================
-       ДОХОД
-       ============================================================ */
     let editingIncomeId = null;
     let incomeSourceIdDraft = null;
 
@@ -2121,9 +2146,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderAll();
     }
 
-    /* ============================================================
-       РАСХОД
-       ============================================================ */
     let expenseCatId = null;
     let editingExpenseId = null;
     let expenseSourceIdDraft = null;
@@ -2161,7 +2183,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         setTimeout(() => document.getElementById('input-expense').focus(), 150);
     }
 
-    // ВАЖНО: сюда передаём false — без кнопки «+ Новый источник»
     function rebuildExpenseSourcePicker() {
         renderSourcePicker(
             'expense-source-picker',
@@ -2333,9 +2354,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderAll();
     });
 
-    /* ============================================================
-       ПЕРЕВОДЫ
-       ============================================================ */
     let transferFromId = null;
     let transferToId = null;
 
@@ -2416,9 +2434,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderAll();
     });
 
-    /* ============================================================
-       КАТЕГОРИИ
-       ============================================================ */
     let editingCatId = null;
     document.getElementById('add-category-btn').addEventListener('click', () => openCategoryModal(null));
 
@@ -2463,9 +2478,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); closeModal('category-modal'); editingCatId = null; renderAll();
     });
 
-    /* ============================================================
-       ЦЕЛИ
-       ============================================================ */
     let editingGoalId = null;
     document.getElementById('add-goal-btn').addEventListener('click', () => openGoalModal(null));
     document.getElementById('info-goals-btn').addEventListener('click', () => {
@@ -2547,9 +2559,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         closeModal('goal-add-modal'); addingToGoalId = null; renderAll();
     });
 
-    /* ============================================================
-       ОБЩИЕ МОДАЛКИ
-       ============================================================ */
     function openModal(id) { document.getElementById(id).classList.add('show'); }
     function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 
