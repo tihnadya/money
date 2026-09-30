@@ -82,7 +82,7 @@ body { background: var(--body-bg); }
 
 .row-space-between { display:flex; justify-content:space-between; align-items:center; }
 
-.badge { background:var(--badge); padding:4px 12px; border-radius:30px; font-size:13px; font-weight:500; color:var(--text); text-transform:capitalize; }
+.badge { background:var(--badge); padding:4px 12px; border-radius:30px; font-size:13px; font-weight:500; color:var(--text); }
 
 .src-dot {
     display: inline-block !important;
@@ -152,7 +152,6 @@ body { background: var(--body-bg); }
 .plan-progress-fill { height:100%; background:var(--primary); border-radius:10px; transition:width .4s; }
 .plan-progress-fill.over { background:var(--minus); }
 
-/* ====== КАРТОЧКА КАТЕГОРИИ ====== */
 .category-item {
     padding: 12px 0;
     border-bottom: 1px solid var(--border);
@@ -311,7 +310,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .chart-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; height:100%; justify-content:flex-end; }
 .chart-bar { width:100%; background:var(--primary); border-radius:8px 8px 0 0; min-height:4px; opacity:.85; transition:.3s; }
 .chart-bar.prev { opacity:.45; background:var(--chart-prev); }
-.chart-label { font-size:11px; color:var(--muted); padding-bottom:6px; }
+.chart-label { font-size:11px; color:var(--muted); padding-bottom:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
 
 .settings-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); gap:10px; }
 .settings-row:last-child { border-bottom:none; }
@@ -319,18 +318,17 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 .settings-row .value { color:var(--muted); text-align:right; }
 .settings-row .value.editable { cursor:pointer; color:var(--primary); font-weight:600; }
 
-.history-row {
+.snapshot-row {
     display:flex; justify-content:space-between; align-items:center;
     padding:12px 0; border-bottom:1px solid var(--border);
     gap:10px; cursor:pointer; transition:.15s;
 }
-.history-row:last-child { border-bottom:none; }
-.history-row:hover { background:var(--soft); margin:0 -18px; padding-left:18px; padding-right:18px; }
-.history-row.current { background:var(--income-total-bg); margin:0 -18px; padding-left:18px; padding-right:18px; border-radius:12px; }
-.history-row .h-name { color:var(--text); font-weight:500; flex:1; }
-.history-row .h-balance { color:var(--text); font-weight:600; }
-.history-row .h-balance.minus { color:var(--minus); }
-.history-row .h-chev { color:var(--muted); font-size:16px; }
+.snapshot-row:last-child { border-bottom:none; }
+.snapshot-row:hover { background:var(--soft); margin:0 -18px; padding-left:18px; padding-right:18px; }
+.snapshot-row .sn-name { color:var(--text); font-weight:500; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.snapshot-row .sn-balance { color:var(--text); font-weight:600; flex-shrink:0; }
+.snapshot-row .sn-balance.minus { color:var(--minus); }
+.snapshot-row .sn-chev { color:var(--muted); font-size:16px; flex-shrink:0; }
 
 .theme-selector { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 4px; }
 .theme-dot { width:36px; height:36px; border-radius:40px; border:2px solid transparent; cursor:pointer; transition:.2s; }
@@ -536,7 +534,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         </div>
 
         <div class="card">
-            <div class="card-title">Баланс месяца</div>
+            <div class="card-title">Баланс</div>
             <div class="card-amount" id="balance-amount">0 <small>₽</small></div>
             <div class="card-sub" id="balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
 
@@ -573,11 +571,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     <div class="page" id="page-stat">
         <div class="header">
             <h1>Статистика</h1>
-            <span class="text-muted small" id="stat-month">—</span>
         </div>
 
         <div class="card">
-            <div class="card-title">План на месяц</div>
+            <div class="card-title">План</div>
             <div class="card-amount" id="stat-plan-amount">0 <small>₽</small></div>
             <div class="card-sub" id="stat-plan-sub">Потрачено 0 ₽ · Осталось 0 ₽</div>
 
@@ -603,7 +600,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         </div>
 
         <div class="card">
-            <div class="card-title">Баланс месяца</div>
+            <div class="card-title">Баланс</div>
             <div class="card-amount" id="stat-balance">0 <small>₽</small></div>
             <div class="card-sub" id="stat-balance-sub">Доход 0 ₽ · Расход 0 ₽</div>
             <div class="balance-sources" id="stat-balance-sources"></div>
@@ -638,9 +635,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-title">Как работают цели</div>
             <div class="goal-hint" style="margin-top:6px;">
                 Создайте цель и укажите сумму, которую хотите накопить.
-                В конце месяца, если у вас остались свободные деньги (доход минус расходы),
-                они автоматически уйдут в <b>основную</b> цель. Если цель не накопилась —
-                она продолжит копиться в следующих месяцах, пока не достигнет нужной суммы.
+                Пополняйте цель вручную — когда захотите. Например, переводите остаток в конце месяца.
             </div>
         </div>
 
@@ -650,21 +645,19 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
     <div class="page" id="page-analytics">
         <div class="header">
-            <h1>Аналитика</h1>
-            <span class="text-muted small">Сравнение месяцев</span>
+            <h1>История</h1>
+            <span class="text-muted small">снимки месяцев</span>
         </div>
 
         <div class="card">
-            <div class="card-title">Текущий месяц vs прошлый</div>
+            <div class="card-title">Текущий журнал vs последний снимок</div>
             <div class="chart-placeholder" id="month-chart"></div>
             <div id="compare-block"></div>
         </div>
 
         <div class="card">
-            <div class="row-space-between mb-1">
-                <span class="card-title">История месяцев</span>
-                <span class="text-muted small">нажмите, чтобы открыть</span>
-            </div>
+            <div class="card-title">Зафиксированные месяцы</div>
+            <div class="text-muted small mb-1">Нажмите «📅 Зафиксировать месяц» в настройках, чтобы сохранить снимок текущих данных.</div>
             <div id="history-list"></div>
         </div>
     </div>
@@ -693,8 +686,12 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         <div class="card">
             <div class="card-title">Месяц</div>
-            <div class="text-muted small mb-1">Сбросить расходы текущего месяца. Планы и доходы сохранятся.</div>
-            <button class="button-reset" id="reset-month">Обнулить траты за месяц</button>
+            <div class="text-muted small mb-1">
+                Зафиксировать текущий месяц — сохранить снимок всех данных в историю.
+                Ничего не удаляется и не обнуляется: данные останутся как есть.
+            </div>
+            <button class="btn-primary" id="snapshot-month" style="margin-top:6px;">📅 Зафиксировать месяц</button>
+            <button class="button-reset" id="reset-month" style="margin-top:10px;">Обнулить только расходы и переводы</button>
         </div>
 
         <div class="card">
@@ -710,7 +707,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <div class="card-title">Данные</div>
             <div class="text-muted small mb-1">
                 Данные хранятся в браузере под ключом <b>money_tochka</b> и не удаляются при обновлении кода.
-                Можно сделать резервную копию или восстановить из файла.
             </div>
             <button class="btn-secondary" id="export-data" style="width:100%;margin-top:6px;">📤 Экспорт данных</button>
             <button class="btn-secondary" id="import-data-btn" style="width:100%;margin-top:8px;">📥 Импорт данных</button>
@@ -718,7 +714,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         </div>
 
         <div class="card">
-            <div class="settings-row"><span class="label">Всего месяцев в истории</span><span class="value" id="months-count">0</span></div>
+            <div class="settings-row"><span class="label">Всего снимков в истории</span><span class="value" id="months-count">0</span></div>
             <button class="button-reset" id="clear-all" style="margin-top:10px;">Удалить все данные</button>
         </div>
 
@@ -731,7 +727,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         <button class="active" data-page="main"><span class="nav-icon">🏠</span>Главная</button>
         <button data-page="stat"><span class="nav-icon">📊</span>Статистика</button>
         <button data-page="goals"><span class="nav-icon">🎯</span>Цели</button>
-        <button data-page="analytics"><span class="nav-icon">📈</span>Аналитика</button>
+        <button data-page="analytics"><span class="nav-icon">📖</span>История</button>
         <button data-page="settings"><span class="nav-icon">⚙️</span>Настройки</button>
     </div>
 </div>
@@ -753,7 +749,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         <div class="field">
             <label>Куда поступило</label>
             <div class="source-picker-dynamic" id="income-source-picker"></div>
-            <div class="hint">Это будет источник в балансе месяца. Например «Сбербанк», «Тинькофф», «Наличные».</div>
+            <div class="hint">Это будет источник в балансе. Например «Сбербанк», «Тинькофф», «Наличные».</div>
         </div>
         <div class="modal-actions">
             <button class="btn-secondary" data-close="income-modal">Отмена</button>
@@ -825,7 +821,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             <input type="text" id="input-cat-name" placeholder="Например: Продукты" maxlength="40">
         </div>
         <div class="field">
-            <label>План на месяц, ₽</label>
+            <label>План, ₽</label>
             <input type="text" id="input-cat-plan" placeholder="0" inputmode="decimal" autocomplete="off">
             <div class="hint">Можно с копейками: например 5000,25</div>
         </div>
@@ -872,13 +868,33 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     </div>
 </div>
 
-<div class="modal-overlay" id="month-view-modal">
+<div class="modal-overlay" id="snapshot-view-modal">
     <div class="modal">
-        <h3 id="month-view-title">Месяц</h3>
-        <div class="text-muted small mb-1" id="month-view-sub">Полная картина месяца</div>
-        <div id="month-view-content"></div>
+        <h3 id="snapshot-view-title">Снимок месяца</h3>
+        <div class="text-muted small mb-1" id="snapshot-view-sub">Полная картина месяца</div>
+        <div id="snapshot-view-content"></div>
         <div class="modal-actions">
-            <button class="btn-secondary" data-close="month-view-modal">Закрыть</button>
+            <button class="btn-secondary" id="delete-snapshot" style="background:var(--reset-bg);color:var(--reset-text);">Удалить</button>
+            <button class="btn-primary" data-close="snapshot-view-modal">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="snapshot-create-modal">
+    <div class="modal">
+        <h3>Зафиксировать месяц</h3>
+        <div class="text-muted small mb-1">
+            Сохраняется снимок всех текущих данных: доходы, расходы, план, категории, переводы, остатки.
+            Ничего не удаляется и не обнуляется.
+        </div>
+        <div class="field">
+            <label>Название снимка</label>
+            <input type="text" id="input-snapshot-name" placeholder="Например: Октябрь 2026" maxlength="60">
+            <div class="hint">По умолчанию — сегодняшняя дата</div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" data-close="snapshot-create-modal">Отмена</button>
+            <button class="btn-primary" id="save-snapshot">Сохранить снимок</button>
         </div>
     </div>
 </div>
@@ -949,12 +965,14 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         'money_tochka_v1'
     ];
 
+    const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
     function loadState() {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (parsed && parsed.months) return parsed;
+                if (parsed && parsed.current) return parsed;
             }
         } catch (e) {}
         for (const k of LEGACY_KEYS) {
@@ -962,7 +980,11 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 const raw = localStorage.getItem(k);
                 if (!raw) continue;
                 const parsed = JSON.parse(raw);
-                if (parsed && parsed.months) {
+                if (!parsed) continue;
+                if (parsed.months) {
+                    return migrateFromOldFormat(parsed);
+                }
+                if (parsed.current) {
                     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
                     return parsed;
                 }
@@ -971,155 +993,98 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         return null;
     }
 
-    function currentMonthKey() {
-        const d = new Date();
-        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    function migrateFromOldFormat(old) {
+        const monthKeys = Object.keys(old.months || {}).sort();
+        let current = null;
+        const snapshots = [];
+
+        monthKeys.forEach((k, idx) => {
+            const m = old.months[k];
+            const isLast = idx === monthKeys.length - 1;
+            const snapshot = convertOldMonthToSnapshot(k, m);
+            if (isLast) {
+                current = {
+                    sources: m.sources || [],
+                    incomes: m.incomes || [],
+                    categories: m.categories || [],
+                    transfers: m.transfers || []
+                };
+            } else {
+                snapshots.push(snapshot);
+            }
+        });
+
+        if (!current) current = { sources: [], incomes: [], categories: [], transfers: [] };
+
+        return {
+            userName: old.userName || '',
+            accent: old.accent || 'pink',
+            mode: old.mode || 'light',
+            goals: old.goals || [],
+            current: current,
+            snapshots: snapshots
+        };
     }
-    function prevMonthKey(key) {
-        const [y, m] = key.split('-').map(Number);
-        const d = new Date(y, m - 2, 1);
-        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+
+    function convertOldMonthToSnapshot(key, m) {
+        return {
+            id: 'snap_' + key,
+            name: monthLabelFromKey(key),
+            createdAt: Date.now(),
+            sources: (m.sources || []).map(s => ({ id: s.id, name: s.name, type: s.type })),
+            incomes: (m.incomes || []).map(i => ({
+                id: i.id, name: i.name, amount: round2(i.amount || 0), sourceId: i.sourceId
+            })),
+            categories: (m.categories || []).map(c => ({
+                id: c.id, name: c.name, plan: round2(c.plan || 0),
+                expenses: (c.expenses || []).map(e => ({
+                    id: e.id, amount: round2(e.amount || 0), sourceId: e.sourceId, ts: e.ts
+                }))
+            })),
+            transfers: (m.transfers || []).map(t => ({
+                id: t.id, fromId: t.fromId, toId: t.toId, amount: round2(t.amount || 0), ts: t.ts
+            }))
+        };
     }
-    const MONTHS_RU = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-    function monthLabel(key) {
+
+    function monthLabelFromKey(key) {
         const [y, m] = key.split('-').map(Number);
         return MONTHS_RU[m - 1] + ' ' + y;
     }
-    function monthShort(key) {
-        const [y, m] = key.split('-').map(Number);
-        return MONTHS_RU[m - 1].slice(0, 3).toLowerCase();
-    }
 
-    function emptyMonth() {
-        return {
-            sources: [],
-            incomes: [],
-            categories: [],
-            transfers: [],
-            closed: false
-        };
+    function emptyCurrent() {
+        return { sources: [], incomes: [], categories: [], transfers: [] };
     }
 
     let state = {
         userName: '',
         accent: 'pink',
         mode: 'light',
-        months: {},
         goals: [],
-        lastClosedMonth: null
+        current: emptyCurrent(),
+        snapshots: []
     };
 
     const loaded = loadState();
     if (loaded) state = Object.assign(state, loaded);
 
     if (!state.goals) state.goals = [];
-    if (!state.months) state.months = {};
+    if (!state.snapshots) state.snapshots = [];
+    if (!state.current) state.current = emptyCurrent();
+    if (!state.current.sources) state.current.sources = [];
+    if (!state.current.incomes) state.current.incomes = [];
+    if (!state.current.categories) state.current.categories = [];
+    if (!state.current.transfers) state.current.transfers = [];
     if (!state.accent) state.accent = 'pink';
     if (!state.mode) state.mode = 'light';
     if (typeof state.userName !== 'string') state.userName = '';
-
-    const THIS_MONTH = currentMonthKey();
-    if (!state.months[THIS_MONTH]) state.months[THIS_MONTH] = emptyMonth();
 
     function newId(prefix) {
         return (prefix || 'x') + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
     }
 
-    function migrateMonth(m) {
-        if (!m) return;
-
-        if (!Array.isArray(m.sources)) m.sources = [];
-        if (!Array.isArray(m.incomes)) m.incomes = [];
-        if (!Array.isArray(m.categories)) m.categories = [];
-        if (!Array.isArray(m.transfers)) m.transfers = [];
-
-        m.sources.forEach(s => {
-            if (!s.id) s.id = newId('s');
-            if (!s.name) s.name = s.type === 'cash' ? 'Наличные' : 'Карта';
-            if (s.type !== 'card' && s.type !== 'cash') s.type = 'card';
-        });
-
-        const oldCard = typeof m.incomeCard === 'number' ? m.incomeCard : 0;
-        const oldCash = typeof m.incomeCash === 'number' ? m.incomeCash : 0;
-        if (oldCard > 0) {
-            let src = m.sources.find(s => s.name === 'Карта' && s.type === 'card');
-            if (!src) { src = { id: newId('s'), name: 'Карта', type: 'card' }; m.sources.push(src); }
-            m.incomes.push({ id: newId('i'), name: 'Доход на карте', amount: round2(oldCard), sourceId: src.id });
-        }
-        if (oldCash > 0) {
-            let src = m.sources.find(s => s.name === 'Наличные' && s.type === 'cash');
-            if (!src) { src = { id: newId('s'), name: 'Наличные', type: 'cash' }; m.sources.push(src); }
-            m.incomes.push({ id: newId('i'), name: 'Доход наличными', amount: round2(oldCash), sourceId: src.id });
-        }
-
-        m.incomes.forEach(i => {
-            if (!i.id) i.id = newId('i');
-            if (!i.name) i.name = 'Доход';
-            if (i.amount == null) i.amount = 0;
-            if (i.sourceId) return;
-            const oldSrc = i.source === 'cash' ? 'cash' : 'card';
-            const name = oldSrc === 'cash' ? 'Наличные' : 'Карта';
-            let src = m.sources.find(s => s.type === oldSrc && s.name === name);
-            if (!src) {
-                src = { id: newId('s'), name: name, type: oldSrc };
-                m.sources.push(src);
-            }
-            i.sourceId = src.id;
-            delete i.source;
-        });
-
-        m.categories.forEach(c => {
-            if (!c.id) c.id = newId('c');
-            if (!Array.isArray(c.expenses)) c.expenses = [];
-            if (typeof c.plan !== 'number') c.plan = 0;
-        });
-
-        const oldTransfer = typeof m.transferCard === 'number' ? m.transferCard : 0;
-        if (oldTransfer !== 0 && m.transfers.length === 0) {
-            const cardSrc = m.sources.find(s => s.type === 'card');
-            const cashSrc = m.sources.find(s => s.type === 'cash');
-            if (cardSrc && cashSrc) {
-                if (oldTransfer > 0) {
-                    m.transfers.push({ id: newId('t'), fromId: cardSrc.id, toId: cashSrc.id, amount: round2(oldTransfer), ts: Date.now() });
-                } else {
-                    m.transfers.push({ id: newId('t'), fromId: cashSrc.id, toId: cardSrc.id, amount: round2(-oldTransfer), ts: Date.now() });
-                }
-            }
-        }
-
-        delete m.incomeCard;
-        delete m.incomeCash;
-        delete m.balanceCard;
-        delete m.balanceCash;
-        delete m.transferCard;
-
-        m.categories.forEach(c => {
-            (c.expenses || []).forEach(e => {
-                if (!e.id) e.id = newId('e');
-                if (!e.sourceId) {
-                    const oldSrc = e.source === 'cash' ? 'cash' : 'card';
-                    const name = oldSrc === 'cash' ? 'Наличные' : 'Карта';
-                    let src = m.sources.find(s => s.type === oldSrc && s.name === name);
-                    if (!src) {
-                        src = { id: newId('s'), name: name, type: oldSrc };
-                        m.sources.push(src);
-                    }
-                    e.sourceId = src.id;
-                    delete e.source;
-                }
-            });
-            delete c.spentCard;
-            delete c.spentCash;
-        });
-    }
-    Object.keys(state.months).forEach(k => migrateMonth(state.months[k]));
-
     function save() {
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
-    }
-    function getMonth(key) {
-        if (!state.months[key]) state.months[key] = emptyMonth();
-        return state.months[key];
     }
 
     function round2(n) {
@@ -1164,41 +1129,34 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         return round2((c.expenses || []).reduce((s, e) => s + (e.amount || 0), 0));
     }
 
-    function findSource(m, id) {
-        return (m.sources || []).find(s => s.id === id);
+    function findSource(container, id) {
+        return (container.sources || []).find(s => s.id === id);
     }
     function sourceLabel(s) {
         if (!s) return '—';
         return s.name || (s.type === 'cash' ? 'Наличные' : 'Карта');
     }
 
-    function monthTotals(key) {
-        const m = state.months[key];
-        if (!m) return {
-            income: 0, spent: 0, planned: 0, balance: 0,
-            bySource: [], incomeBySource: {}, spentBySource: {}
-        };
-
+    function computeTotals(container) {
         const incomeBySource = {};
-        (m.incomes || []).forEach(i => {
+        (container.incomes || []).forEach(i => {
             incomeBySource[i.sourceId] = round2((incomeBySource[i.sourceId] || 0) + (i.amount || 0));
         });
 
         const spentBySource = {};
-        (m.categories || []).forEach(c => {
+        (container.categories || []).forEach(c => {
             (c.expenses || []).forEach(e => {
                 spentBySource[e.sourceId] = round2((spentBySource[e.sourceId] || 0) + (e.amount || 0));
             });
         });
 
-        const transIn = {};
-        const transOut = {};
-        (m.transfers || []).forEach(t => {
+        const transIn = {}, transOut = {};
+        (container.transfers || []).forEach(t => {
             transOut[t.fromId] = round2((transOut[t.fromId] || 0) + (t.amount || 0));
             transIn[t.toId] = round2((transIn[t.toId] || 0) + (t.amount || 0));
         });
 
-        const bySource = (m.sources || []).map(s => {
+        const bySource = (container.sources || []).map(s => {
             const inc = incomeBySource[s.id] || 0;
             const sp = spentBySource[s.id] || 0;
             const tIn = transIn[s.id] || 0;
@@ -1209,7 +1167,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         const income = round2(bySource.reduce((s, x) => s + x.income, 0));
         const spent = round2(bySource.reduce((s, x) => s + x.spent, 0));
-        const planned = round2((m.categories || []).reduce((s, c) => s + (c.plan || 0), 0));
+        const planned = round2((container.categories || []).reduce((s, c) => s + (c.plan || 0), 0));
         const balance = round2(bySource.reduce((s, x) => s + x.balance, 0));
 
         return { income, spent, planned, balance, bySource, incomeBySource, spentBySource };
@@ -1219,29 +1177,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     function getPrimaryGoal() {
         return state.goals.find(g => g.primary && !g.archived) ||
                state.goals.find(g => !g.archived) || null;
-    }
-    function closePastMonths() {
-        const primary = getPrimaryGoal();
-        const keys = Object.keys(state.months).filter(k => k !== THIS_MONTH).sort();
-        let changed = false;
-        keys.forEach(k => {
-            const m = state.months[k];
-            if (m.closed) return;
-            const t = monthTotals(k);
-            const savings = t.balance > 0 ? t.balance : 0;
-            if (savings > 0 && primary) {
-                primary.current = round2((primary.current || 0) + savings);
-                m.savedToGoal = round2((m.savedToGoal || 0) + savings);
-                m.savedToGoalName = primary.name;
-            }
-            m.closed = true;
-            m.closedSavings = savings;
-            changed = true;
-        });
-        if (changed) {
-            state.lastClosedMonth = keys[keys.length - 1] || null;
-            save();
-        }
     }
 
     function renderUserName() {
@@ -1275,10 +1210,16 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     });
 
     function renderMain() {
-        const m = getMonth(THIS_MONTH);
-        const t = monthTotals(THIS_MONTH);
+        const c = state.current;
+        const t = computeTotals(c);
 
-        document.getElementById('month-badge').textContent = monthLabel(THIS_MONTH);
+        const badge = document.getElementById('month-badge');
+        if (state.snapshots.length > 0) {
+            const last = [...state.snapshots].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+            badge.textContent = last.name;
+        } else {
+            badge.textContent = 'журнал';
+        }
 
         const balEl = document.getElementById('balance-amount');
         const subEl = document.getElementById('balance-sub');
@@ -1293,16 +1234,16 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             subEl.textContent = 'Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽';
         }
 
-        renderBalanceSources('balance-sources', THIS_MONTH);
+        renderBalanceSources('balance-sources', t);
         renderMainGoalPreview();
         renderIncomeList();
 
         const list = document.getElementById('category-list');
         list.innerHTML = '';
-        if (m.categories.length === 0) {
+        if (c.categories.length === 0) {
             list.innerHTML = '<div class="empty-hint">Пока нет пунктов плана.<br>Нажмите «+ Добавить пункт плана» ниже.</div>';
         } else {
-            m.categories.forEach(cat => {
+            c.categories.forEach(cat => {
                 const plan = round2(cat.plan || 0);
                 const spent = catSpentTotal(cat);
                 const left = round2(plan - spent);
@@ -1317,7 +1258,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 if (srcKeys.length > 0) {
                     srcMini = '<div class="src-mini">';
                     srcKeys.forEach(sid => {
-                        const s = findSource(m, sid);
+                        const s = findSource(c, sid);
                         const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
                         srcMini += '<span class="src-chip">' +
                             '<span class="src-dot ' + dotClass + '"></span>' +
@@ -1371,19 +1312,18 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         });
     }
 
-    function renderBalanceSources(targetId, monthKey) {
-        const m = getMonth(monthKey);
+    function renderBalanceSources(targetId, t) {
+        const c = state.current;
         const box = document.getElementById(targetId);
         if (!box) return;
         box.innerHTML = '';
 
-        if (!m.sources || m.sources.length === 0) {
+        if (!c.sources || c.sources.length === 0) {
             box.innerHTML = '<div class="empty-hint" style="grid-column:1/-1;">' +
                 'Пока нет источников.<br>Добавьте доход — и карта или наличные появятся здесь.</div>';
             return;
         }
 
-        const t = monthTotals(monthKey);
         t.bySource.forEach(item => {
             const s = item.source;
             const dotClass = s.type === 'cash' ? 'cash' : 'card';
@@ -1408,19 +1348,19 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     }
 
     function renderIncomeList() {
-        const m = getMonth(THIS_MONTH);
+        const c = state.current;
         const list = document.getElementById('income-list');
-        const t = monthTotals(THIS_MONTH);
+        const t = computeTotals(c);
         document.getElementById('income-total-badge').textContent = fmt(t.income) + ' ₽';
 
         list.innerHTML = '';
-        if (!m.incomes || m.incomes.length === 0) {
+        if (!c.incomes || c.incomes.length === 0) {
             list.innerHTML = '<div class="empty-hint">Пока нет доходов.<br>Нажмите «+ Добавить доход» ниже.</div>';
             return;
         }
 
-        m.incomes.forEach(income => {
-            const s = findSource(m, income.sourceId);
+        c.incomes.forEach(income => {
+            const s = findSource(c, income.sourceId);
             const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
             const div = document.createElement('div');
             div.className = 'income-item';
@@ -1478,10 +1418,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     }
 
     function renderStat() {
-        const m = getMonth(THIS_MONTH);
-        const t = monthTotals(THIS_MONTH);
-
-        document.getElementById('stat-month').textContent = monthLabel(THIS_MONTH);
+        const c = state.current;
+        const t = computeTotals(c);
 
         const planned = t.planned;
         const spent = t.spent;
@@ -1546,14 +1484,14 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             subEl.textContent = 'Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽';
         }
 
-        renderBalanceSources('stat-balance-sources', THIS_MONTH);
+        renderBalanceSources('stat-balance-sources', t);
 
         const catBox = document.getElementById('stat-categories');
         catBox.innerHTML = '';
-        if (m.categories.length === 0) {
+        if (c.categories.length === 0) {
             catBox.innerHTML = '<div class="empty-hint">Нет категорий</div>';
         } else {
-            m.categories.forEach(cat => {
+            c.categories.forEach(cat => {
                 const plan = round2(cat.plan || 0);
                 const s = catSpentTotal(cat);
                 const p = plan > 0 ? Math.min(100, (s / plan) * 100) : (s > 0 ? 100 : 0);
@@ -1568,7 +1506,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 if (srcKeys.length > 0) {
                     srcLine = '<div class="src-mini">';
                     srcKeys.forEach(sid => {
-                        const src = findSource(m, sid);
+                        const src = findSource(c, sid);
                         const dotClass = (src && src.type === 'cash') ? 'cash' : 'card';
                         srcLine += '<span class="src-chip">' +
                             '<span class="src-dot ' + dotClass + '"></span>' +
@@ -1595,10 +1533,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         const rowsBox = document.getElementById('stat-income-rows');
         rowsBox.innerHTML = '';
-        if ((m.sources || []).length === 0) {
+        if ((c.sources || []).length === 0) {
             rowsBox.innerHTML = '<div class="empty-hint">Нет источников</div>';
         } else {
-            m.sources.forEach(s => {
+            c.sources.forEach(s => {
                 const inc = t.incomeBySource[s.id] || 0;
                 const sp = t.spentBySource[s.id] || 0;
                 const dotClass = s.type === 'cash' ? 'cash' : 'card';
@@ -1611,7 +1549,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 rowsBox.appendChild(row);
             });
         }
-        document.getElementById('stat-income-total').textContent = fmt(t.income - t.spent) + ' ₽';
+        document.getElementById('stat-income-total').textContent = fmt(t.income) + ' ₽';
         document.getElementById('stat-spent-total').textContent = fmt(t.spent) + ' ₽';
     }
 
@@ -1664,8 +1602,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                 '</div>' +
                 (goal.monthlyHistory && goal.monthlyHistory.length
                     ? '<div class="goal-hint">' +
-                        'Зачислено: ' +
-                        goal.monthlyHistory.map(h => monthShort(h.month) + ' — ' + fmt(h.amount) + ' ₽').join(', ') +
+                        'Пополнения: ' +
+                        goal.monthlyHistory.map(h => h.name + ' — ' + fmt(h.amount) + ' ₽').join(', ') +
                       '</div>'
                     : '') +
                 (done
@@ -1698,27 +1636,44 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         save(); renderAll();
     }
 
-    function renderAnalytics() {
-        const prevKey = prevMonthKey(THIS_MONTH);
-        const cur = monthTotals(THIS_MONTH);
-        const prev = state.months[prevKey] ? monthTotals(prevKey) : { income: 0, spent: 0, balance: 0 };
+    /* ============================================================
+       ИСТОРИЯ: сравнение с последним снимком + список снимков
+       ============================================================ */
+    function renderCompare() {
+        const cur = computeTotals(state.current);
+
+        const sortedSnaps = [...state.snapshots].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        const last = sortedSnaps[0] || null;
 
         const chart = document.getElementById('month-chart');
+        const compare = document.getElementById('compare-block');
+        if (!chart || !compare) return;
+
+        if (!last) {
+            chart.innerHTML = '';
+            compare.innerHTML =
+                '<div class="empty-hint">Снимков пока нет.<br>' +
+                'Нажмите «📅 Зафиксировать месяц» в настройках, чтобы сохранить текущие данные. ' +
+                'После этого здесь появится сравнение текущего журнала с последним снимком.</div>';
+            return;
+        }
+
+        const prev = computeTotals(last);
+
         const maxVal = Math.max(cur.spent, prev.spent, cur.income, prev.income, 1);
-        const hCurSpent = Math.round((cur.spent / maxVal) * 110) + 4;
-        const hPrevSpent = Math.round((prev.spent / maxVal) * 110) + 4;
+        const hCur = Math.round((cur.spent / maxVal) * 110) + 4;
+        const hPrev = Math.round((prev.spent / maxVal) * 110) + 4;
 
         chart.innerHTML =
             '<div class="chart-col">' +
-                '<div class="chart-bar prev" style="height:' + hPrevSpent + 'px;"></div>' +
-                '<div class="chart-label">' + monthShort(prevKey) + '</div>' +
+                '<div class="chart-bar prev" style="height:' + hPrev + 'px;"></div>' +
+                '<div class="chart-label">' + escapeHtml(last.name || 'снимок') + '</div>' +
             '</div>' +
             '<div class="chart-col">' +
-                '<div class="chart-bar" style="height:' + hCurSpent + 'px;"></div>' +
-                '<div class="chart-label">' + monthShort(THIS_MONTH) + '</div>' +
+                '<div class="chart-bar" style="height:' + hCur + 'px;"></div>' +
+                '<div class="chart-label">сейчас</div>' +
             '</div>';
 
-        const compare = document.getElementById('compare-block');
         const diffSpent = round2(cur.spent - prev.spent);
         const diffIncome = round2(cur.income - prev.income);
 
@@ -1742,76 +1697,72 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             '</div>' +
             '<div class="text-muted small mt-1">' +
                 (diffSpent > 0
-                    ? '⚠️ В этом месяце вы тратите больше, чем в прошлом.'
+                    ? '⚠️ Сейчас вы тратите больше, чем в «' + escapeHtml(last.name) + '».'
                     : diffSpent < 0
-                        ? '👍 В этом месяце вы тратите меньше, чем в прошлом.'
-                        : 'Расходы такие же, как в прошлом месяце.') +
+                        ? '👍 Сейчас вы тратите меньше, чем в «' + escapeHtml(last.name) + '».'
+                        : 'Расходы такие же, как в «' + escapeHtml(last.name) + '».') +
             '</div>';
-
-        const historyBox = document.getElementById('history-list');
-        historyBox.innerHTML = '';
-        const keys = Object.keys(state.months).sort().reverse();
-        if (keys.length === 0) {
-            historyBox.innerHTML = '<div class="empty-hint">История пуста</div>';
-        } else {
-            keys.forEach(k => {
-                const t = monthTotals(k);
-                const isCurrent = k === THIS_MONTH;
-                const div = document.createElement('div');
-                div.className = 'history-row' + (isCurrent ? ' current' : '');
-                div.innerHTML =
-                    '<span class="h-name">' + monthLabel(k) + (isCurrent ? ' · текущий' : '') + '</span>' +
-                    '<span class="h-balance' + (t.balance < 0 ? ' minus' : '') + '">' +
-                        (t.balance < 0 ? '−' : '') + fmt(Math.abs(t.balance)) + ' ₽' +
-                    '</span>' +
-                    '<span class="h-chev">›</span>';
-                div.addEventListener('click', () => openMonthView(k));
-                historyBox.appendChild(div);
-            });
-        }
-        document.getElementById('months-count').textContent = keys.length;
     }
 
-    let viewingMonthKey = null;
+    function renderHistory() {
+        const box = document.getElementById('history-list');
+        box.innerHTML = '';
 
-    function openMonthView(key) {
-        viewingMonthKey = key;
-        const m = getMonth(key);
-        const t = monthTotals(key);
-        const isCurrent = key === THIS_MONTH;
+        if (state.snapshots.length === 0) {
+            box.innerHTML = '<div class="empty-hint">Пока ничего не зафиксировано.<br>' +
+                'Нажмите «📅 Зафиксировать месяц» в настройках.</div>';
+            return;
+        }
 
-        document.getElementById('month-view-title').textContent = monthLabel(key);
-        document.getElementById('month-view-sub').textContent =
-            isCurrent ? 'Текущий месяц' : 'Прошлый месяц · только просмотр';
+        const sorted = [...state.snapshots].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        sorted.forEach(sn => {
+            const t = computeTotals(sn);
+            const div = document.createElement('div');
+            div.className = 'snapshot-row';
+            div.innerHTML =
+                '<span class="sn-name">' + escapeHtml(sn.name) + '</span>' +
+                '<span class="sn-balance' + (t.balance < 0 ? ' minus' : '') + '">' +
+                    (t.balance < 0 ? '−' : '') + fmt(Math.abs(t.balance)) + ' ₽' +
+                '</span>' +
+                '<span class="sn-chev">›</span>';
+            div.addEventListener('click', () => openSnapshotView(sn.id));
+            box.appendChild(div);
+        });
 
-        const box = document.getElementById('month-view-content');
+        document.getElementById('months-count').textContent = state.snapshots.length;
+    }
+
+    let viewingSnapshotId = null;
+
+    function openSnapshotView(id) {
+        const sn = state.snapshots.find(s => s.id === id);
+        if (!sn) return;
+        viewingSnapshotId = id;
+        const t = computeTotals(sn);
+
+        document.getElementById('snapshot-view-title').textContent = sn.name;
+        const dateStr = sn.createdAt ? new Date(sn.createdAt).toLocaleDateString('ru-RU') : '';
+        document.getElementById('snapshot-view-sub').textContent = 'Снимок от ' + dateStr;
+
+        const box = document.getElementById('snapshot-view-content');
         let html = '';
 
         html += '<div class="card" style="margin-bottom:12px;">' +
-            '<div class="card-title">Итоги месяца</div>' +
+            '<div class="card-title">Итоги</div>' +
             '<div class="card-amount" style="font-size:24px;color:' +
                 (t.balance < 0 ? 'var(--minus)' : 'var(--text)') + ';">' +
                 (t.balance < 0 ? '−' : '') + fmt(Math.abs(t.balance)) + ' <small>₽</small>' +
             '</div>' +
-            '<div class="card-sub">Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽</div>';
-
-        if (!isCurrent && m.closed && m.savedToGoal > 0) {
-            html += '<div class="goal-hint" style="margin-top:8px;background:var(--income-total-bg);">' +
-                '✅ Переведено в цель «' + escapeHtml(m.savedToGoalName || '') + '»: <b>' +
-                fmt(m.savedToGoal) + ' ₽</b></div>';
-        } else if (!isCurrent && m.closed && (!m.savedToGoal || m.savedToGoal === 0)) {
-            html += '<div class="goal-hint" style="margin-top:8px;">В цель ничего не переведено (остаток ≤ 0)</div>';
-        }
-
-        html += '</div>';
+            '<div class="card-sub">Доход ' + fmt(t.income) + ' ₽ · Расход ' + fmt(t.spent) + ' ₽</div>' +
+        '</div>';
 
         html += '<div class="card" style="margin-bottom:12px;">' +
             '<div class="card-title">Доходы</div>';
-        if (!m.incomes || m.incomes.length === 0) {
+        if (!sn.incomes || sn.incomes.length === 0) {
             html += '<div class="empty-hint">Доходов не было</div>';
         } else {
-            m.incomes.forEach(i => {
-                const s = findSource(m, i.sourceId);
+            sn.incomes.forEach(i => {
+                const s = findSource(sn, i.sourceId);
                 const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
                 html += '<div class="income-item" style="border-bottom:1px solid var(--border);">' +
                     '<div class="ii-info">' +
@@ -1830,7 +1781,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         html += '<div class="card" style="margin-bottom:12px;">' +
             '<div class="card-title">Остатки по источникам</div>';
-        if (!m.sources || m.sources.length === 0) {
+        if (!sn.sources || sn.sources.length === 0) {
             html += '<div class="empty-hint">Источников не было</div>';
         } else {
             t.bySource.forEach(item => {
@@ -1844,12 +1795,12 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         }
         html += '</div>';
 
-        if (m.transfers && m.transfers.length > 0) {
+        if (sn.transfers && sn.transfers.length > 0) {
             html += '<div class="card" style="margin-bottom:12px;">' +
                 '<div class="card-title">Переводы</div>';
-            m.transfers.forEach(tr => {
-                const fromS = findSource(m, tr.fromId);
-                const toS = findSource(m, tr.toId);
+            sn.transfers.forEach(tr => {
+                const fromS = findSource(sn, tr.fromId);
+                const toS = findSource(sn, tr.toId);
                 html += '<div class="income-row">' +
                     '<span class="label">' + escapeHtml(sourceLabel(fromS)) + ' → ' + escapeHtml(sourceLabel(toS)) + '</span>' +
                     '<span class="value">' + fmt(tr.amount) + ' ₽</span>' +
@@ -1861,10 +1812,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         html += '<div class="card" style="margin-bottom:12px;">' +
             '<div class="card-title">План / факт по категориям</div>';
 
-        if (m.categories.length === 0) {
-            html += '<div class="empty-hint">В этом месяце не было пунктов плана</div>';
+        if (sn.categories.length === 0) {
+            html += '<div class="empty-hint">Не было пунктов плана</div>';
         } else {
-            m.categories.forEach(cat => {
+            sn.categories.forEach(cat => {
                 const plan = round2(cat.plan || 0);
                 const spent = catSpentTotal(cat);
                 const left = round2(plan - spent);
@@ -1889,10 +1840,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
                     '</div>';
 
                 if (count > 0) {
-                    const sorted = [...cat.expenses].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+                    const sorted2 = [...cat.expenses].sort((a, b) => (b.ts || 0) - (a.ts || 0));
                     html += '<div style="margin-top:8px;padding:8px 10px;background:var(--soft);border-radius:10px;">';
-                    sorted.forEach(e => {
-                        const s = findSource(m, e.sourceId);
+                    sorted2.forEach(e => {
+                        const s = findSource(sn, e.sourceId);
                         const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
                         html += '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;font-size:12px;">' +
                             '<span style="color:var(--text);font-weight:500;">' + fmt(e.amount) + ' ₽</span>' +
@@ -1912,96 +1863,63 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
         html += '</div>';
 
-        if (!isCurrent) {
-            html += '<div style="display:flex;gap:8px;margin-top:6px;">' +
-                '<button class="btn-secondary" id="copy-plan-btn" style="flex:1;">📋 Скопировать план</button>' +
-                '<button class="btn-secondary" id="copy-income-btn" style="flex:1;">💰 Скопировать доход</button>' +
-            '</div>';
-        }
-
         box.innerHTML = html;
 
-        const copyPlanBtn = document.getElementById('copy-plan-btn');
-        const copyIncomeBtn = document.getElementById('copy-income-btn');
-        if (copyPlanBtn) copyPlanBtn.addEventListener('click', () => copyPlanFromMonth(key));
-        if (copyIncomeBtn) copyIncomeBtn.addEventListener('click', () => copyIncomeFromMonth(key));
+        document.getElementById('delete-snapshot').onclick = () => {
+            if (!confirm('Удалить снимок «' + sn.name + '»?')) return;
+            state.snapshots = state.snapshots.filter(s => s.id !== id);
+            save();
+            closeModal('snapshot-view-modal');
+            renderAll();
+        };
 
-        openModal('month-view-modal');
+        openModal('snapshot-view-modal');
     }
 
-    function copyPlanFromMonth(sourceKey) {
-        const src = getMonth(sourceKey);
-        if (src.categories.length === 0) {
-            alert('В этом месяце нет пунктов плана для копирования');
-            return;
-        }
-        if (!confirm('Скопировать план (' + src.categories.length + ' пунктов) из ' +
-                     monthLabel(sourceKey) + ' в текущий месяц?\n' +
-                     'Существующие пункты плана в текущем месяце будут заменены.')) return;
+    document.getElementById('snapshot-month').addEventListener('click', () => {
+        const today = new Date();
+        const defaultName = MONTHS_RU[today.getMonth()] + ' ' + today.getFullYear();
+        document.getElementById('input-snapshot-name').value = defaultName;
+        openModal('snapshot-create-modal');
+        setTimeout(() => document.getElementById('input-snapshot-name').focus(), 150);
+    });
 
-        const dst = getMonth(THIS_MONTH);
-        dst.categories = src.categories.map(c => ({
-            id: newId('c'),
-            name: c.name,
-            plan: round2(c.plan || 0),
-            expenses: []
-        }));
+    document.getElementById('save-snapshot').addEventListener('click', () => {
+        const name = document.getElementById('input-snapshot-name').value.trim() ||
+                     (MONTHS_RU[new Date().getMonth()] + ' ' + new Date().getFullYear());
 
+        const c = state.current;
+        const snapshot = {
+            id: newId('snap_'),
+            name: name,
+            createdAt: Date.now(),
+            sources: JSON.parse(JSON.stringify(c.sources || [])),
+            incomes: JSON.parse(JSON.stringify(c.incomes || [])),
+            categories: JSON.parse(JSON.stringify(c.categories || [])),
+            transfers: JSON.parse(JSON.stringify(c.transfers || []))
+        };
+
+        state.snapshots.push(snapshot);
         save();
+        closeModal('snapshot-create-modal');
         renderAll();
-        if (viewingMonthKey) openMonthView(viewingMonthKey);
-        alert('План скопирован в ' + monthLabel(THIS_MONTH));
-    }
+        alert('Снимок «' + name + '» сохранён. Данные не обнулены.');
+    });
 
-    function copyIncomeFromMonth(sourceKey) {
-        const src = getMonth(sourceKey);
-        const dst = getMonth(THIS_MONTH);
-
-        if (!src.incomes || src.incomes.length === 0) {
-            alert('В этом месяце нет доходов для копирования');
-            return;
-        }
-        if (!confirm('Скопировать доходы из ' + monthLabel(sourceKey) + ' в текущий месяц?\n' +
-                     'Записей: ' + src.incomes.length + '\n' +
-                     'Источники и названия сохранятся.')) return;
-
-        const srcMap = {};
-        (src.sources || []).forEach(s => {
-            let existing = (dst.sources || []).find(x => x.name === s.name && x.type === s.type);
-            if (!existing) {
-                existing = { id: newId('s'), name: s.name, type: s.type };
-                dst.sources.push(existing);
-            }
-            srcMap[s.id] = existing.id;
-        });
-
-        dst.incomes = src.incomes.map(i => ({
-            id: newId('i'),
-            name: i.name || 'Доход',
-            amount: round2(i.amount || 0),
-            sourceId: srcMap[i.sourceId] || i.sourceId
-        }));
-
-        save();
-        renderAll();
-        if (viewingMonthKey) openMonthView(viewingMonthKey);
-        alert('Доходы скопированы в ' + monthLabel(THIS_MONTH));
-    }
-
-    function renderSourcePicker(targetId, monthKey, activeId, onPick, withAddButton) {
-        const m = getMonth(monthKey);
+    function renderSourcePicker(targetId, activeId, onPick, withAddButton) {
+        const c = state.current;
         const box = document.getElementById(targetId);
         if (!box) return;
         box.innerHTML = '';
 
-        if ((m.sources || []).length === 0) {
+        if ((c.sources || []).length === 0) {
             const hint = document.createElement('div');
             hint.className = 'empty-hint';
             hint.style.flex = '1 1 100%';
             hint.textContent = 'Нет источников. Сначала добавьте доход.';
             box.appendChild(hint);
         } else {
-            m.sources.forEach(s => {
+            c.sources.forEach(s => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.dataset.sourceId = s.id;
@@ -2046,9 +1964,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     document.getElementById('save-source').addEventListener('click', () => {
         const name = document.getElementById('input-source-name').value.trim();
         if (!name) { alert('Введите название'); return; }
-        const m = getMonth(THIS_MONTH);
-        if (!m.sources) m.sources = [];
-        let existing = m.sources.find(s => s.name.toLowerCase() === name.toLowerCase());
+        const c = state.current;
+        if (!c.sources) c.sources = [];
+        let existing = c.sources.find(s => s.name.toLowerCase() === name.toLowerCase());
         if (existing) {
             if (!confirm('Источник с таким названием уже есть. Использовать его?')) return;
             closeModal('source-modal');
@@ -2057,7 +1975,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             return;
         }
         const src = { id: newId('s'), name: name, type: newSourceType };
-        m.sources.push(src);
+        c.sources.push(src);
         save();
         closeModal('source-modal');
         if (newSourceCallback) newSourceCallback(src.id);
@@ -2069,13 +1987,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
     function openIncomeModal(id) {
         editingIncomeId = id;
-        const m = getMonth(THIS_MONTH);
+        const c = state.current;
         const titleEl = document.getElementById('income-modal-title');
         const nameInp = document.getElementById('input-income-name');
         const amountInp = document.getElementById('input-income-amount');
 
         if (id) {
-            const item = (m.incomes || []).find(i => i.id === id);
+            const item = (c.incomes || []).find(i => i.id === id);
             if (!item) return;
             titleEl.textContent = 'Изменить доход';
             nameInp.value = item.name || '';
@@ -2085,7 +2003,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             titleEl.textContent = 'Новый доход';
             nameInp.value = '';
             amountInp.value = '';
-            incomeSourceIdDraft = (m.sources[0] && m.sources[0].id) || null;
+            incomeSourceIdDraft = (c.sources[0] && c.sources[0].id) || null;
         }
         rebuildIncomeSourcePicker();
         openModal('income-modal');
@@ -2095,7 +2013,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     function rebuildIncomeSourcePicker() {
         renderSourcePicker(
             'income-source-picker',
-            THIS_MONTH,
             incomeSourceIdDraft,
             (id) => { incomeSourceIdDraft = id; rebuildIncomeSourcePicker(); },
             true
@@ -2112,18 +2029,18 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         if (!amount) { alert('Введите сумму'); return; }
         if (!incomeSourceIdDraft) { alert('Выберите источник (или создайте новый)'); return; }
 
-        const m = getMonth(THIS_MONTH);
-        if (!m.incomes) m.incomes = [];
+        const c = state.current;
+        if (!c.incomes) c.incomes = [];
 
         if (editingIncomeId) {
-            const item = m.incomes.find(i => i.id === editingIncomeId);
+            const item = c.incomes.find(i => i.id === editingIncomeId);
             if (item) {
                 item.name = name;
                 item.amount = amount;
                 item.sourceId = incomeSourceIdDraft;
             }
         } else {
-            m.incomes.push({
+            c.incomes.push({
                 id: newId('i'),
                 name: name,
                 amount: amount,
@@ -2137,11 +2054,11 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     });
 
     function deleteIncome(id) {
-        const m = getMonth(THIS_MONTH);
-        const item = (m.incomes || []).find(i => i.id === id);
+        const c = state.current;
+        const item = (c.incomes || []).find(i => i.id === id);
         if (!item) return;
         if (!confirm('Удалить доход «' + (item.name || 'Доход') + '»?')) return;
-        m.incomes = m.incomes.filter(i => i.id !== id);
+        c.incomes = c.incomes.filter(i => i.id !== id);
         save();
         renderAll();
     }
@@ -2153,13 +2070,13 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     function openExpenseModal(catId) {
         expenseCatId = catId;
         editingExpenseId = null;
-        const m = getMonth(THIS_MONTH);
-        const cat = m.categories.find(c => c.id === catId);
+        const c = state.current;
+        const cat = c.categories.find(cc => cc.id === catId);
         if (!cat) return;
         document.getElementById('expense-modal-title').textContent = 'Расход: ' + cat.name;
         document.getElementById('input-expense').value = '';
         document.getElementById('save-expense').textContent = 'Добавить';
-        expenseSourceIdDraft = (m.sources[0] && m.sources[0].id) || null;
+        expenseSourceIdDraft = (c.sources[0] && c.sources[0].id) || null;
         rebuildExpenseSourcePicker();
         openModal('expense-modal');
         setTimeout(() => document.getElementById('input-expense').focus(), 150);
@@ -2168,8 +2085,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     function openEditExpenseModal(catId, expenseId) {
         expenseCatId = catId;
         editingExpenseId = expenseId;
-        const m = getMonth(THIS_MONTH);
-        const cat = m.categories.find(c => c.id === catId);
+        const c = state.current;
+        const cat = c.categories.find(cc => cc.id === catId);
         if (!cat) return;
         const exp = (cat.expenses || []).find(e => e.id === expenseId);
         if (!exp) return;
@@ -2186,7 +2103,6 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     function rebuildExpenseSourcePicker() {
         renderSourcePicker(
             'expense-source-picker',
-            THIS_MONTH,
             expenseSourceIdDraft,
             (id) => { expenseSourceIdDraft = id; rebuildExpenseSourcePicker(); updateExpenseHint(); },
             false
@@ -2195,8 +2111,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     }
 
     function updateExpenseHint() {
-        const m = getMonth(THIS_MONTH);
-        const t = monthTotals(THIS_MONTH);
+        const c = state.current;
+        const t = computeTotals(c);
         const hint = document.getElementById('expense-balance-hint');
         if (!hint) return;
         if (!expenseSourceIdDraft) {
@@ -2205,7 +2121,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         }
         const item = t.bySource.find(x => x.source.id === expenseSourceIdDraft);
         const avail = item ? item.balance : 0;
-        const s = findSource(m, expenseSourceIdDraft);
+        const s = findSource(c, expenseSourceIdDraft);
         const nm = sourceLabel(s);
         if (avail < 0) {
             hint.innerHTML = 'На «' + escapeHtml(nm) + '» уже минус: <b style="color:var(--minus)">' +
@@ -2219,7 +2135,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         const amount = parseMoney(document.getElementById('input-expense').value);
         if (!amount) { alert('Введите сумму'); return; }
         if (!expenseSourceIdDraft) { alert('Выберите источник'); return; }
-        const cat = getMonth(THIS_MONTH).categories.find(c => c.id === expenseCatId);
+        const c = state.current;
+        const cat = c.categories.find(cc => cc.id === expenseCatId);
         if (!cat) { closeModal('expense-modal'); return; }
 
         if (editingExpenseId) {
@@ -2256,8 +2173,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     }
 
     function renderExpenseLog() {
-        const m = getMonth(THIS_MONTH);
-        const cat = m.categories.find(c => c.id === logCatId);
+        const c = state.current;
+        const cat = c.categories.find(cc => cc.id === logCatId);
         if (!cat) return;
 
         document.getElementById('expense-list-title').textContent = 'Расходы: ' + cat.name;
@@ -2272,7 +2189,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             bySrc[e.sourceId] = round2((bySrc[e.sourceId] || 0) + (e.amount || 0));
         });
         Object.keys(bySrc).forEach(sid => {
-            const s = findSource(m, sid);
+            const s = findSource(c, sid);
             const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
             const div = document.createElement('div');
             div.className = 's';
@@ -2301,7 +2218,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         const sorted = [...list].sort((a, b) => (b.ts || 0) - (a.ts || 0));
 
         sorted.forEach(e => {
-            const s = findSource(m, e.sourceId);
+            const s = findSource(c, e.sourceId);
             const dotClass = (s && s.type === 'cash') ? 'cash' : 'card';
             const div = document.createElement('div');
             div.className = 'expense-log-item';
@@ -2333,7 +2250,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             btn.addEventListener('click', function () {
                 const eid = this.dataset.expenseId;
                 if (!confirm('Удалить этот расход?')) return;
-                const cat2 = getMonth(THIS_MONTH).categories.find(c => c.id === logCatId);
+                const c2 = state.current;
+                const cat2 = c2.categories.find(cc => cc.id === logCatId);
                 if (!cat2) return;
                 cat2.expenses = (cat2.expenses || []).filter(x => x.id !== eid);
                 save();
@@ -2345,7 +2263,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
 
     document.getElementById('clear-category-expenses').addEventListener('click', () => {
         if (!logCatId) return;
-        const cat = getMonth(THIS_MONTH).categories.find(c => c.id === logCatId);
+        const c = state.current;
+        const cat = c.categories.find(cc => cc.id === logCatId);
         if (!cat) return;
         if (!confirm('Стереть ВСЕ расходы в категории «' + cat.name + '»?')) return;
         cat.expenses = [];
@@ -2358,10 +2277,10 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     let transferToId = null;
 
     function openTransferModal(preselectFromId) {
-        const m = getMonth(THIS_MONTH);
-        const t = monthTotals(THIS_MONTH);
+        const c = state.current;
+        const t = computeTotals(c);
 
-        if (!m.sources || m.sources.length < 2) {
+        if (!c.sources || c.sources.length < 2) {
             alert('Нужно минимум два источника (например две карты или карта и наличные).\nДобавьте доход — источники появятся автоматически.');
             return;
         }
@@ -2379,8 +2298,8 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
             cur.appendChild(div);
         });
 
-        transferFromId = preselectFromId || m.sources[0].id;
-        transferToId = m.sources.find(s => s.id !== transferFromId).id;
+        transferFromId = preselectFromId || c.sources[0].id;
+        transferToId = c.sources.find(s => s.id !== transferFromId).id;
 
         document.getElementById('input-transfer').value = '';
         document.getElementById('transfer-modal-title').textContent = 'Перевод между источниками';
@@ -2394,21 +2313,21 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     }
 
     function rebuildTransferPickers() {
-        renderSourcePicker('transfer-from-picker', THIS_MONTH, transferFromId,
+        renderSourcePicker('transfer-from-picker', transferFromId,
             (id) => {
                 transferFromId = id;
                 if (transferToId === id) {
-                    const other = getMonth(THIS_MONTH).sources.find(s => s.id !== id);
+                    const other = state.current.sources.find(s => s.id !== id);
                     transferToId = other ? other.id : null;
                 }
                 rebuildTransferPickers();
             }, false);
 
-        renderSourcePicker('transfer-to-picker', THIS_MONTH, transferToId,
+        renderSourcePicker('transfer-to-picker', transferToId,
             (id) => {
                 transferToId = id;
                 if (transferFromId === id) {
-                    const other = getMonth(THIS_MONTH).sources.find(s => s.id !== id);
+                    const other = state.current.sources.find(s => s.id !== id);
                     transferFromId = other ? other.id : null;
                 }
                 rebuildTransferPickers();
@@ -2420,9 +2339,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         if (!amount) { alert('Введите сумму'); return; }
         if (!transferFromId || !transferToId) { alert('Выберите источники'); return; }
         if (transferFromId === transferToId) { alert('Источники должны различаться'); return; }
-        const m = getMonth(THIS_MONTH);
-        if (!m.transfers) m.transfers = [];
-        m.transfers.push({
+        const c = state.current;
+        if (!c.transfers) c.transfers = [];
+        c.transfers.push({
             id: newId('t'),
             fromId: transferFromId,
             toId: transferToId,
@@ -2444,7 +2363,7 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         const planInp = document.getElementById('input-cat-plan');
 
         if (id) {
-            const cat = getMonth(THIS_MONTH).categories.find(c => c.id === id);
+            const cat = state.current.categories.find(c => c.id === id);
             if (!cat) return;
             title.textContent = 'Редактировать пункт';
             nameInp.value = cat.name;
@@ -2463,12 +2382,12 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         const plan = parseMoney(document.getElementById('input-cat-plan').value);
         if (!name) { alert('Введите название'); return; }
 
-        const m = getMonth(THIS_MONTH);
+        const c = state.current;
         if (editingCatId) {
-            const cat = m.categories.find(c => c.id === editingCatId);
+            const cat = c.categories.find(x => x.id === editingCatId);
             if (cat) { cat.name = name; cat.plan = plan; }
         } else {
-            m.categories.push({
+            c.categories.push({
                 id: newId('c'),
                 name: name,
                 plan: plan,
@@ -2548,12 +2467,9 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         if (g) {
             g.current = round2((g.current || 0) + amount);
             if (!g.monthlyHistory) g.monthlyHistory = [];
-            const last = g.monthlyHistory[g.monthlyHistory.length - 1];
-            if (last && last.month === THIS_MONTH && last.manual) {
-                last.amount = round2(last.amount + amount);
-            } else {
-                g.monthlyHistory.push({ month: THIS_MONTH, amount: amount, manual: true });
-            }
+            const now = new Date();
+            const label = MONTHS_RU[now.getMonth()] + ' ' + now.getFullYear();
+            g.monthlyHistory.push({ name: label, amount: amount, ts: Date.now() });
             save();
         }
         closeModal('goal-add-modal'); addingToGoalId = null; renderAll();
@@ -2606,17 +2522,17 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
     });
 
     document.getElementById('reset-month').addEventListener('click', () => {
-        if (!confirm('Обнулить все расходы и переводы текущего месяца? Планы и доходы сохранятся.')) return;
-        const m = getMonth(THIS_MONTH);
-        m.categories.forEach(c => { c.expenses = []; });
-        m.transfers = [];
+        if (!confirm('Обнулить ТОЛЬКО расходы и переводы текущего журнала?\nКатегории плана и доходы останутся.\n\nЗафиксированные снимки не тронуты.')) return;
+        state.current.categories.forEach(c => { c.expenses = []; });
+        state.current.transfers = [];
         save(); renderAll();
     });
 
     document.getElementById('clear-all').addEventListener('click', () => {
-        if (!confirm('Удалить ВСЕ данные: категории, доходы, цели и историю? Это нельзя отменить.')) return;
-        state.months = {}; state.months[THIS_MONTH] = emptyMonth();
-        state.goals = []; state.lastClosedMonth = null;
+        if (!confirm('Удалить ВСЕ данные: журнал, цели, историю снимков? Это нельзя отменить.')) return;
+        state.current = emptyCurrent();
+        state.goals = [];
+        state.snapshots = [];
         state.userName = '';
         save(); renderAll();
     });
@@ -2653,22 +2569,29 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         reader.onload = function (e) {
             try {
                 const parsed = JSON.parse(e.target.result);
-                if (!parsed || typeof parsed !== 'object' || !parsed.months) {
+                if (!parsed || typeof parsed !== 'object') {
                     alert('Это не похоже на файл резервной копии.');
                     return;
                 }
                 if (!confirm('Импортировать данные из файла?\nВсе текущие данные будут заменены.')) return;
 
-                state = Object.assign({
-                    userName: '',
-                    accent: 'pink', mode: 'light', months: {}, goals: [], lastClosedMonth: null
-                }, parsed);
+                if (parsed.months && !parsed.current) {
+                    state = migrateFromOldFormat(parsed);
+                } else {
+                    state = Object.assign({
+                        userName: '',
+                        accent: 'pink', mode: 'light', goals: [],
+                        current: emptyCurrent(), snapshots: []
+                    }, parsed);
+                }
+
                 if (!state.goals) state.goals = [];
-                if (!state.months) state.months = {};
-                if (typeof state.userName !== 'string') state.userName = '';
-                const THIS_MONTH_NOW = currentMonthKey();
-                if (!state.months[THIS_MONTH_NOW]) state.months[THIS_MONTH_NOW] = emptyMonth();
-                Object.keys(state.months).forEach(k => migrateMonth(state.months[k]));
+                if (!state.snapshots) state.snapshots = [];
+                if (!state.current) state.current = emptyCurrent();
+                if (!state.current.sources) state.current.sources = [];
+                if (!state.current.incomes) state.current.incomes = [];
+                if (!state.current.categories) state.current.categories = [];
+                if (!state.current.transfers) state.current.transfers = [];
 
                 save();
                 renderAll();
@@ -2686,20 +2609,12 @@ body.mode-dark .icon-btn.list { background:#2e2a38; }
         renderMain();
         renderStat();
         renderGoals();
-        renderAnalytics();
+        renderCompare();
+        renderHistory();
         applyAppearance();
     }
 
-    closePastMonths();
     renderAll();
-
-    document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) {
-            const nowKey = currentMonthKey();
-            if (nowKey !== THIS_MONTH) location.reload();
-            else { closePastMonths(); renderAll(); }
-        }
-    });
 })();
 </script>
 </body>
